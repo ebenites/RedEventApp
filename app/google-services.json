@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "479945493508",
+    "firebase_url": "https://redeventapp.firebaseio.com",
+    "project_id": "redeventapp",
+    "storage_bucket": "redeventapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:479945493508:android:796d98191559695a",
+        "android_client_info": {
+          "package_name": "pe.edu.upc.redevent"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "479945493508-4988onl1c6scdedumjmsvnlg2kctgt82.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pe.edu.upc.redevent",
+            "certificate_hash": "82C5EC56AA820644DFA90A418592C4CEA5C9CF7A"
+          }
+        },
+        {
+          "client_id": "479945493508-b75b9mkm5o8uh1h26e3ovfountm1f4h2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjyowWjqWebSiyAA8g8MM_DVVySeO2cAw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "479945493508-b75b9mkm5o8uh1h26e3ovfountm1f4h2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
