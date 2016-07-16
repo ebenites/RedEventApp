@@ -8,4 +8,8 @@
     <color name="colorSecondaryText">#00FF00</color>
     <color name="colorIcons">#FFFFFF</color>
     <color name="colorDivider">#B6B6B6</color>
+
+    <color name="colorBackground">#FFFFFF</color>
+
+    <color name="black_overlay">#66000000</color>
 </resources>

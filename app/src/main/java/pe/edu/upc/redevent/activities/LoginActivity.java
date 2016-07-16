@@ -1,13 +1,19 @@
 package pe.edu.upc.redevent.activities;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -33,6 +39,9 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import pe.edu.upc.redevent.R;
 
@@ -60,6 +69,11 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
 
         // Set up the login form.
         mLoginFormView = findViewById(R.id.login_form);
@@ -111,6 +125,9 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
+
+        // Request Permissions
+        validatePermissions();
     }
 
     private void attemptEmailSignIn() {
@@ -297,4 +314,55 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
         }
     }
 
+    /**
+     * Permissions
+     */
+
+    private static final int REDEVENT_PERMISSIONS_REQUEST = 100;
+
+    private static List<String> REDEVENT_PERMISSIONS_LIST;
+
+    static {
+        REDEVENT_PERMISSIONS_LIST = new ArrayList<>();
+        REDEVENT_PERMISSIONS_LIST.add(Manifest.permission.INTERNET);
+        REDEVENT_PERMISSIONS_LIST.add(Manifest.permission.GET_ACCOUNTS);
+        REDEVENT_PERMISSIONS_LIST.add(Manifest.permission.WRITE_CALENDAR);
+        REDEVENT_PERMISSIONS_LIST.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        REDEVENT_PERMISSIONS_LIST.add(Manifest.permission.CAMERA);
+        REDEVENT_PERMISSIONS_LIST.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+    }
+
+    private boolean permissionsGranted(){
+        for (String permission : REDEVENT_PERMISSIONS_LIST){
+            if(ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED)
+                return false;
+        }
+        return true;
+    }
+
+    private void validatePermissions(){
+        if(!permissionsGranted()){
+            ActivityCompat.requestPermissions(this, REDEVENT_PERMISSIONS_LIST.toArray(new String[REDEVENT_PERMISSIONS_LIST.size()]), REDEVENT_PERMISSIONS_REQUEST);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
+        switch (requestCode){
+            case REDEVENT_PERMISSIONS_REQUEST: {
+                for (int i=0; i<grantResults.length; i++){
+                    Log.d("REDEVENT", ""+grantResults[i]);
+                    if(grantResults[i] != PackageManager.PERMISSION_GRANTED){
+                        Toast.makeText(this, "Permissions Required!", Toast.LENGTH_LONG).show();
+                        new Handler().postDelayed(new Runnable() {
+                            public void run() {
+                                finishAffinity();
+                            }
+                        }, Toast.LENGTH_LONG);
+                    }
+                }
+            }
+        }
+    }
 }
