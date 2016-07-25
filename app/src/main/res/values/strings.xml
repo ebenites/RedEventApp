@@ -15,4 +15,8 @@
     <string name="title_activity_splash">SplashActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="topics_info_text">Seleccione los tópicos que le interese</string>
+    <string name="topics_save_button">Guardar preferencias</string>
+
 </resources>
