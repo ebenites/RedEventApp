@@ -19,4 +19,7 @@
     <string name="topics_info_text">Seleccione los tópicos que le interese</string>
     <string name="topics_save_button">Guardar preferencias</string>
 
+    <string name="event_checking">Checking Event</string>
+    <string name="default_text">No name kept</string>
+
 </resources>
