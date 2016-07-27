@@ -5,10 +5,13 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +22,7 @@ public class EventActivity extends AppCompatActivity {
     private static final String PREF_NAME = "Name";
 
     TextView nameTextView;
+    float userrating;
 
     // Storage Access Class
     SharedPreferences sharedPreferences;
@@ -32,17 +36,16 @@ public class EventActivity extends AppCompatActivity {
         mCheckInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                displayRating();
+                displayQuestionRating();
             }
         });
     }
 
-   private void updateCurrentName(String name) {
+    private void updateCurrentName(String name) {
         // Updates UI element
-        if(name.length() > 0) nameTextView.setText("Stored name is " + name);
+        if (name.length() > 0) nameTextView.setText("Stored name is " + name);
         else nameTextView.setText(R.string.default_text);
     }
-
 
 
     private void updateKeptName(String name) {
@@ -61,47 +64,103 @@ public class EventActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(PREFS, MODE_PRIVATE);
     }
 
-    private void displayRating() {
-        openPreferences();
-        String name = restoreKeptName();
-        if (name.length() > 0) {
-            Toast.makeText(this, "Welcome back " + name + "!", Toast.LENGTH_LONG).show();
-            updateCurrentName(name);
-        } else {
-            AlertDialog.Builder alert = new AlertDialog.Builder(this);
-            alert.setTitle("Name Keeper");
-            alert.setMessage("Whats is your name?");
-            //final EditText input = new EditText(this);
-            //alert.setView(input);
+    private void displayQuestionRating() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Desea Evaluar el Evento?");
+        alert.setPositiveButton("Evaluar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //String inputName = input.getText().toString();
+                displayRating();
+            }
+        });
+        alert.setNegativeButton("En Otro Momento", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Nothing
+            }
+        });
+        alert.show();
+    }
 
-            LinearLayout layout = new LinearLayout(this);
-            layout.setOrientation(LinearLayout.VERTICAL);
-            final EditText inputFirstName = new EditText(this);
-            final EditText inputLastName = new EditText(this);
-            inputFirstName.setHint("First Name");
-            inputLastName.setHint("Last Name");
-            layout.addView(inputFirstName);
-            layout.addView(inputLastName);
-            alert.setView(layout);
-            alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    //String inputName = input.getText().toString();
-                    String inputName = inputFirstName.getText().toString() +
-                            " " + inputLastName.getText().toString();
-                    updateKeptName(inputName);
-                    Toast.makeText(getApplicationContext(),
-                            "Welcome "+inputName+"!",Toast.LENGTH_LONG).show();
+    private void displayRating() {
+        //openPreferences();
+        //String name = restoreKeptName();
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Rating Event");
+
+        //final EditText input = new EditText(this);
+        //alert.setView(input);
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+        final RatingBar inputRatingEvent = new RatingBar(this);
+        final TextView statusRatingEvent = new TextView(this);
+
+
+        LinearLayout.LayoutParams ratingParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        ratingParams.gravity = Gravity.CENTER;
+        inputRatingEvent.setLayoutParams(ratingParams);
+
+        inputRatingEvent.setNumStars(5);
+        inputRatingEvent.setStepSize((float)1);
+        inputRatingEvent.setRating(5);
+
+
+
+
+        inputRatingEvent.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+
+                userrating= inputRatingEvent.getRating();
+
+                if(userrating == 0){
+
+                    inputRatingEvent.setRating(1);
+
                 }
-            });
-            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // Nothing
+                if(userrating == 1){
+                    statusRatingEvent.setText("Malo");
                 }
-            });
-            alert.show();
-        }
+                if(userrating == 2){
+                    statusRatingEvent.setText("Regular");
+                }
+                if(userrating == 3){
+                    statusRatingEvent.setText("Bueno");
+                }
+                if(userrating == 4){
+                    statusRatingEvent.setText("Muy Bueno");
+                }
+                if(userrating == 5){
+                    statusRatingEvent.setText("Excelente");
+                }
+
+            }
+        });
+
+        layout.addView(inputRatingEvent);
+        layout.addView(statusRatingEvent);
+
+        alert.setView(layout);
+        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //String inputName = input.getText().toString();
+                float rating = inputRatingEvent.getRating();
+                String inputName =  Float.toString(rating);
+                updateKeptName(inputName);
+            }
+        });
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Nothing
+            }
+        });
+        alert.show();
 
     }
 
