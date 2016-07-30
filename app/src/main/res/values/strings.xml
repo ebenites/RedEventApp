@@ -23,4 +23,8 @@
     <string name="event_value">Valorar Evento</string>
     <string name="default_text">No name kept</string>
 
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+
 </resources>
