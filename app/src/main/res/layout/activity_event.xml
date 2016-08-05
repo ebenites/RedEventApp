@@ -33,7 +33,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:src="@drawable/image_default"
-        android:scaleType="fitXY" />
+        android:scaleType="centerInside" />
 
     <TextView
         android:layout_width="match_parent"
@@ -114,7 +114,7 @@
         android:id="@+id/value_button"
         android:layout_below="@+id/checking_button"
         android:layout_alignParentEnd="true"
-        android:visibility="visible"
+        android:visibility="invisible"
         android:singleLine="true" />
 
 </RelativeLayout>
