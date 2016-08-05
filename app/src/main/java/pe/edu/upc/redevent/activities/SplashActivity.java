@@ -20,7 +20,7 @@ public class SplashActivity extends AppCompatActivity {
 
         new Handler().postDelayed(new Runnable() {
             public void run() {
-                startActivity(new Intent(SplashActivity.this, LoginActivity.class));
+                startActivity(new Intent(SplashActivity.this, EventActivity.class));
                 finish();
             }
         }, SPLASH_DISPLAY_LENGTH);
