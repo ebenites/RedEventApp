@@ -38,16 +38,31 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.orm.SugarRecord;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import pe.edu.upc.redevent.R;
+import pe.edu.upc.redevent.models.APIError;
+import pe.edu.upc.redevent.models.User;
+import pe.edu.upc.redevent.pe.edu.upc.redevent.services.RedEventService;
+import pe.edu.upc.redevent.utils.PreferencesManager;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LoginActivity extends AppCompatActivity implements OnConnectionFailedListener {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
+
+    // PreferencesManager
+    protected PreferencesManager preferencesManager;
 
     // UI references.
     private View mLoginFormView;
@@ -125,6 +140,9 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
+        // Load Share preferences
+        preferencesManager = PreferencesManager.getInstance(this);
+        mEmailView.setText(preferencesManager.loadPreference(PreferencesManager.PREF_EMAIL));
 
         // Request Permissions
         validatePermissions();
@@ -167,10 +185,98 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
         // Show a progress spinner, and kick off a background task to  perform the user login attempt.
         showProgress(true);
 
-        /* TEMP */  Toast.makeText(this, "No implementado aún", Toast.LENGTH_LONG).show();
+        /*
+            Login or Register Process ...
+         */
 
-//        UserLoginTask mAuthTask = new UserLoginTask(email, password);
-//        mAuthTask.execute((Void) null);
+        try {
+
+            /*
+                ! Pasar a una clase ServiceGenerator: https://futurestud.io/blog/retrofit-getting-started-and-android-client#servicegenerator
+                (Luego, Usar: ServiceGenerator.retrofit(), para cambiar de APIError.parseError(retrofit, response); a APIError.parseError(response))
+             */
+
+            // Retrofit Debug: https://futurestud.io/blog/retrofit-2-log-requests-and-responses
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+            httpClient.addInterceptor(logging);
+
+            final Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(RedEventService.BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(httpClient.build()) // For debug
+                    .build();
+
+            RedEventService service = retrofit.create(RedEventService.class);
+
+            Call<User> call = service.login(email, password);
+
+            call.enqueue(new Callback<User>() {
+                @Override
+                public void onResponse(Call<User> call, Response<User> response) {
+                    int statusCode = response.code();
+                    Log.d(MainActivity.class.getSimpleName(), "HTTP status code: " + statusCode);
+
+                    if(response.isSuccessful()) {
+
+                        User user = response.body();
+                        Log.d(MainActivity.class.getSimpleName(), "User: " + user);
+
+                        String fullname = (user.getFullname() != null) ? user.getFullname() : "buddy";
+
+                        Toast.makeText(getApplication(), "Welcome back, " + fullname, Toast.LENGTH_LONG).show();
+
+                        // Share preferences
+                        preferencesManager.savePreference(PreferencesManager.PREF_EMAIL, user.getEmail());
+                        preferencesManager.savePreference(PreferencesManager.PREF_ISLOGGED, "1");
+
+                        // Save with Sugar
+                        SugarRecord.save(user);
+
+                        // IF HAVE NOT PREFERENCES CHANGE TO CONFIG, ELSE CHANGE MAIN ACTIVITY (LIST EVENTS)
+                        if (user.getTopics() == null || user.getTopics().size() == 0) {
+                            Log.d(LoginActivity.class.getSimpleName(), "Go to Preferences...");
+
+                            startActivity(new Intent(LoginActivity.this, TopicActivity.class));
+                            finish();
+                        } else {
+                            Log.d(LoginActivity.class.getSimpleName(), "Go to Events list...");
+
+                            startActivity(new Intent(LoginActivity.this, EventActivity.class));
+                            finish();
+                        }
+
+                    }else{
+                        // Best Practice APIError: https://futurestud.io/blog/retrofit-2-simple-error-handling
+                        APIError error = APIError.parseError(retrofit, response);
+                        Log.e(this.getClass().getSimpleName(), "ApiError " + error.getStatus() + ":" + error.getMessage());
+                        Toast.makeText(getApplication(), error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+
+                }
+
+                @Override
+                public void onFailure(Call<User> call, Throwable t) {
+                    // Log error here since request failed
+                    showProgress(false);
+
+                    Log.e(this.getClass().getSimpleName(), "onFailure:" + t.getMessage());
+                    Toast.makeText(getApplication(), t.getMessage(), Toast.LENGTH_LONG).show();
+                    t.printStackTrace();
+                }
+
+            });
+
+        } catch (Exception e) {
+            Log.e(this.getClass().getSimpleName(), "Exception!" + e.getMessage());
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+
+
+
+
 
     }
 

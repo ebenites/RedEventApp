@@ -9,7 +9,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import pe.edu.upc.redevent.R;
-import pe.edu.upc.redevent.domain.Event;
+import pe.edu.upc.redevent.models.Event;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.MyViewHolder> {
 
