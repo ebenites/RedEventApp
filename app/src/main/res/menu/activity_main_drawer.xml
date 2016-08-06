@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_events"
+            android:icon="@drawable/common_ic_googleplayservices"
+            android:title="Eventos" />
+        <item
+            android:id="@+id/nav_myevents"
+            android:icon="@drawable/common_ic_googleplayservices"
+            android:title="Mis Eventos" />
+        <item
+            android:id="@+id/nav_profile"
+            android:icon="@drawable/common_ic_googleplayservices"
+            android:title="Perfil" />
+
+    </group>
+
+</menu>

@@ -15,4 +15,20 @@
     <string name="title_activity_splash">SplashActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="topics_info_text">Seleccione los tópicos que le interese</string>
+    <string name="topics_save_button">Guardar preferencias</string>
+
+    <string name="event_checking">Checking Evento</string>
+    <string name="event_value">Valorar Evento</string>
+    <string name="default_text">No name kept</string>
+    <string name="event_description">Event description</string>
+    <string name="event_date">Fecha:</string>
+    <string name="event_hour">Hora:</string>
+    <string name="event_address">Dirección:</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+
 </resources>
