@@ -243,7 +243,7 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
                         } else {
                             Log.d(LoginActivity.class.getSimpleName(), "Go to Events list...");
 
-                            startActivity(new Intent(LoginActivity.this, EventActivity.class));
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();
                         }
 
