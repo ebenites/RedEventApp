@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 import pe.edu.upc.redevent.R;
-import pe.edu.upc.redevent.domain.Event;
+import pe.edu.upc.redevent.models.Event;
 import pe.edu.upc.redevent.ui.adapter.EventAdapter;
 
 public class EventsFragment extends Fragment {

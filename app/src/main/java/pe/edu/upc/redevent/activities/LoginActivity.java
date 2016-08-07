@@ -5,7 +5,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,7 +23,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,16 +36,27 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.squareup.picasso.Picasso;
+import com.orm.SugarRecord;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import pe.edu.upc.redevent.R;
+import pe.edu.upc.redevent.models.APIError;
+import pe.edu.upc.redevent.models.User;
+import pe.edu.upc.redevent.services.RedEventService;
+import pe.edu.upc.redevent.services.RedEventServiceGenerator;
+import pe.edu.upc.redevent.utils.PreferencesManager;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity implements OnConnectionFailedListener {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
+
+    // PreferencesManager
+    protected PreferencesManager preferencesManager;
 
     // UI references.
     private View mLoginFormView;
@@ -125,6 +134,9 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
+        // Load Share preferences
+        preferencesManager = PreferencesManager.getInstance(this);
+        mEmailView.setText(preferencesManager.loadPreference(PreferencesManager.PREF_EMAIL));
 
         // Request Permissions
         validatePermissions();
@@ -167,10 +179,79 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
         // Show a progress spinner, and kick off a background task to  perform the user login attempt.
         showProgress(true);
 
-        /* TEMP */  Toast.makeText(this, "No implementado aún", Toast.LENGTH_LONG).show();
+        /*
+            Login or Register Process ...
+         */
 
-//        UserLoginTask mAuthTask = new UserLoginTask(email, password);
-//        mAuthTask.execute((Void) null);
+        try {
+
+            RedEventService service = RedEventServiceGenerator.createService();
+
+            Call<User> call = service.login(email, password);
+
+            call.enqueue(new Callback<User>() {
+                @Override
+                public void onResponse(Call<User> call, Response<User> response) {
+                    int statusCode = response.code();
+                    Log.d(MainActivity.class.getSimpleName(), "HTTP status code: " + statusCode);
+
+                    if(response.isSuccessful()) {
+
+                        User user = response.body();
+                        Log.d(MainActivity.class.getSimpleName(), "User: " + user);
+
+                        String fullname = (user.getFullname() != null) ? user.getFullname() : "buddy";
+
+                        Toast.makeText(getApplication(), getString(R.string.login_welcome_back) + fullname, Toast.LENGTH_LONG).show();
+
+                        // Share preferences
+                        preferencesManager.savePreference(PreferencesManager.PREF_EMAIL, user.getEmail());
+                        preferencesManager.savePreference(PreferencesManager.PREF_ISLOGGED, "1");
+
+                        // Save with Sugar
+                        SugarRecord.deleteAll(User.class);
+                        SugarRecord.save(user);
+
+                        // IF HAVE NOT PREFERENCES CHANGE TO CONFIG, ELSE CHANGE MAIN ACTIVITY (LIST EVENTS)
+                        if (user.getTopics() == null || user.getTopics().size() == 0) {
+                            Log.d(LoginActivity.class.getSimpleName(), "Go to Preferences...");
+
+                            startActivity(new Intent(LoginActivity.this, TopicActivity.class));
+                            finish();
+                        } else {
+                            Log.d(LoginActivity.class.getSimpleName(), "Go to Events list...");
+
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            finish();
+                        }
+
+                    }else{
+                        // Best Practice APIError: https://futurestud.io/blog/retrofit-2-simple-error-handling
+                        APIError error = APIError.parseError(response);
+                        Log.e(this.getClass().getSimpleName(), "ApiError " + error.getStatus() + ":" + error.getMessage());
+                        Toast.makeText(getApplication(), error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+
+                }
+
+                @Override
+                public void onFailure(Call<User> call, Throwable t) {
+                    // Log error here since request failed
+                    showProgress(false);
+
+                    Log.e(this.getClass().getSimpleName(), "onFailure:" + t.getMessage());
+                    Toast.makeText(getApplication(), t.getMessage(), Toast.LENGTH_LONG).show();
+                    t.printStackTrace();
+                }
+
+            });
+
+        } catch (Exception e) {
+            Log.e(this.getClass().getSimpleName(), "Exception!" + e.getMessage());
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+
 
     }
 
@@ -226,47 +307,103 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
                 Log.d(TAG, account.getPhotoUrl().toString());
                 Log.d(TAG, account.getIdToken());
 
-                Toast.makeText(this, "Bienvenido " + account.getDisplayName(), Toast.LENGTH_LONG).show();
-
                 showProgress(true);
 
+                /*
+                    Login or Register Process with Google ...
+                 */
+                /*
                 try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
+
+                    RedEventService service = RedEventServiceGenerator.createService();
+
+                    Call<User> call = service.login(email, password);
+
+                    call.enqueue(new Callback<User>() {
+                        @Override
+                        public void onResponse(Call<User> call, Response<User> response) {
+                            int statusCode = response.code();
+                            Log.d(MainActivity.class.getSimpleName(), "HTTP status code: " + statusCode);
+
+                            if(response.isSuccessful()) {
+
+                                User user = response.body();
+                                Log.d(MainActivity.class.getSimpleName(), "User: " + user);
+
+                                String fullname = (user.getFullname() != null) ? user.getFullname() : "buddy";
+
+                                Toast.makeText(getApplication(), getString(R.string.login_welcome_back) + fullname, Toast.LENGTH_LONG).show();
+
+                                // Share preferences
+                                preferencesManager.savePreference(PreferencesManager.PREF_EMAIL, user.getEmail());
+                                preferencesManager.savePreference(PreferencesManager.PREF_ISLOGGED, "1");
+
+                                // Save with Sugar
+                                SugarRecord.deleteAll(User.class);
+                                SugarRecord.save(user);
+
+                                // IF HAVE NOT PREFERENCES CHANGE TO CONFIG, ELSE CHANGE MAIN ACTIVITY (LIST EVENTS)
+                                if (user.getTopics() == null || user.getTopics().size() == 0) {
+                                    Log.d(LoginActivity.class.getSimpleName(), "Go to Preferences...");
+
+                                    startActivity(new Intent(LoginActivity.this, TopicActivity.class));
+                                    finish();
+                                } else {
+                                    Log.d(LoginActivity.class.getSimpleName(), "Go to Events list...");
+
+                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                    finish();
+                                }
+
+                            }else{
+                                // Best Practice APIError: https://futurestud.io/blog/retrofit-2-simple-error-handling
+                                APIError error = APIError.parseError(response);
+                                Log.e(this.getClass().getSimpleName(), "ApiError " + error.getStatus() + ":" + error.getMessage());
+                                Toast.makeText(getApplication(), error.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<User> call, Throwable t) {
+                            // Log error here since request failed
+                            showProgress(false);
+
+                            Log.e(this.getClass().getSimpleName(), "onFailure:" + t.getMessage());
+                            Toast.makeText(getApplication(), t.getMessage(), Toast.LENGTH_LONG).show();
+                            t.printStackTrace();
+                        }
+
+                    });
+
+                } catch (Exception e) {
+                    Log.e(this.getClass().getSimpleName(), "Exception!" + e.getMessage());
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
 
-                /**
-                 * How to SharedPreferences
-                 */
+                */
 
-                SharedPreferences sharedPreferences = getSharedPreferences("redevent-data",MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("email", account.getEmail());
-                editor.commit();
 
-                Log.d(TAG, "Read from SharedPreferences[email]: " + sharedPreferences.getString("email",""));
 
-//                editor.clear();
-//                editor.commit();
 
                 /**
                  * End SharedPreferences
                  */
-
-                /*TEMP*/    mProgressView.setVisibility(View.GONE);
-                /*TEMP*/    mProgressView.animate().setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime)).alpha(0).setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        mProgressView.setVisibility(View.GONE);
-                    }
-                });
-                /*TEMP*/    findViewById(R.id.login_success_view).setVisibility(View.VISIBLE);
-
-//                http://square.github.io/picasso/
-                /*TEMP*/    Picasso.with(this).load(account.getPhotoUrl()).resize(200, 200).into(((ImageView) findViewById(R.id.profileImageView)));
-                /*TEMP*/    ((TextView)findViewById(R.id.displayNameTextView)).setText(account.getDisplayName());
-                /*TEMP*/    ((TextView)findViewById(R.id.emailTextView)).setText(account.getEmail());
+//
+//                /*TEMP*/    mProgressView.setVisibility(View.GONE);
+//                /*TEMP*/    mProgressView.animate().setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime)).alpha(0).setListener(new AnimatorListenerAdapter() {
+//                    @Override
+//                    public void onAnimationEnd(Animator animation) {
+//                        mProgressView.setVisibility(View.GONE);
+//                    }
+//                });
+//                /*TEMP*/    findViewById(R.id.login_success_view).setVisibility(View.VISIBLE);
+//
+////                http://square.github.io/picasso/
+//                /*TEMP*/    Picasso.with(this).load(account.getPhotoUrl()).resize(200, 200).into(((ImageView) findViewById(R.id.profileImageView)));
+//                /*TEMP*/    ((TextView)findViewById(R.id.displayNameTextView)).setText(account.getDisplayName());
+//                /*TEMP*/    ((TextView)findViewById(R.id.emailTextView)).setText(account.getEmail());
 
 
             } else {

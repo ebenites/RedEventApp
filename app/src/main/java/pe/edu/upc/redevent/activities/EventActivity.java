@@ -8,17 +8,26 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
+import okhttp3.MediaType;
 import pe.edu.upc.redevent.R;
 
+
 public class EventActivity extends AppCompatActivity {
-    private static final String PREFS = "prefs";
-    private static final String PREF_NAME = "Name";
+    private ImageView mImageEvent;
+    private TextView mDescriptionEvent;
+    private TextView mDateEvent;
+    private TextView mHourEvent;
+    private TextView mAddressEvent;
     private Button mvalue_button;
     private Button mCheckInButton;
+
     //TextView nameTextView;
     float userrating;
 
@@ -29,6 +38,26 @@ public class EventActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
+
+        MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
+
+
+        mImageEvent = (ImageView) findViewById(R.id.imageView);
+
+        String coverUrl = "";
+        Picasso.with(this.getBaseContext()).load(coverUrl).into(mImageEvent);
+
+        mDescriptionEvent = (TextView) findViewById(R.id.descriptionEvent);
+        mDescriptionEvent.setText("");
+
+        mDateEvent = (TextView) findViewById(R.id.datevalueEvent);
+        mDateEvent.setText("");
+
+        mHourEvent = (TextView) findViewById(R.id.hourvalueEvent);
+        mHourEvent.setText("");
+
+        mAddressEvent = (TextView) findViewById(R.id.addressvalueEvent);
+        mAddressEvent.setText("");
 
         mvalue_button = (Button) findViewById(R.id.value_button);
         mvalue_button.setOnClickListener(new View.OnClickListener() {
