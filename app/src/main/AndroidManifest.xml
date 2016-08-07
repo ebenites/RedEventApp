@@ -53,7 +53,7 @@
             android:name=".activities.LoginActivity"
             android:label="@string/app_name"></activity>
         <activity android:name=".activities.TopicActivity"></activity>
-        <activity android:name=".activities.EventActivity"></activity>
+        <activity android:name=".activities.EventDetailActivity"></activity>
     </application>
 
 </manifest>

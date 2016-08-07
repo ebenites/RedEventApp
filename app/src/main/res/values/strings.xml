@@ -31,5 +31,11 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="login_welcome_back">"Welcome back, "</string>
 
+    <string name="event_rating_1">"Malo"</string>
+    <string name="event_rating_2">"Regular"</string>
+    <string name="event_rating_3">"Bueno"</string>
+    <string name="event_rating_4">"Muy Bueno"</string>
+    <string name="event_rating_5">"Excelente"</string>
+
 
 </resources>
