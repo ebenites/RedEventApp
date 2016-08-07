@@ -24,6 +24,8 @@ public class User{
 
     private String longitude;
 
+    private String photo;
+
     private List<Topic> topics;
 
     public User() {
@@ -93,6 +95,14 @@ public class User{
         this.topics = topics;
     }
 
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -103,6 +113,7 @@ public class User{
                 ", fullname='" + fullname + '\'' +
                 ", latitude='" + latitude + '\'' +
                 ", longitude='" + longitude + '\'' +
+                ", photo='" + photo + '\'' +
                 ", topics=" + topics +
                 '}';
     }
