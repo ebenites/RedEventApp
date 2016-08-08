@@ -2,6 +2,8 @@ package pe.edu.upc.redevent.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class Event {
@@ -16,7 +18,8 @@ public class Event {
     private String status;
     private String image;
 
-    private Topics topics;
+    @SerializedName("topics")
+    private Topic topic;
 
     public Event(String name, String category, String startdate){
         super();
@@ -107,11 +110,16 @@ public class Event {
         this.image = image;
     }
 
-    public void setTopics(Topics topics) {
-        this.topics = topics;
+    public Topic getTopic() {
+        return topic;
     }
 
-    public Topics getTopics() {
-        return topics;
+    public void setTopic(Topic topic) {
+        this.topic = topic;
     }
+
 }
+
+
+
+

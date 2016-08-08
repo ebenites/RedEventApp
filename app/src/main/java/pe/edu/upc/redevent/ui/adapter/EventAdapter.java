@@ -9,6 +9,10 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import pe.edu.upc.redevent.R;
@@ -48,13 +52,28 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.MyViewHolder
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Event event = eventList.get(position);
         holder.title.setText(event.getName());
-        holder.category.setText(String.valueOf(event.getMaxattendees()));
-        holder.date.setText(event.getStartdate());
+        holder.category.setText(String.valueOf(event.getTopic().getName()));
+        holder.date.setText(getStartdateFormatted(event.getStartdate()));
+
+
         Picasso.with(holder.itemView.getContext()).
                 load(RedEventService.API_BASE_URL.concat(event.getImage()))
-                .resize(50, 50)
-                .centerCrop()
+                .placeholder(R.drawable.image_default)
+                .resizeDimen(R.dimen.list_detail_image_size, R.dimen.list_detail_image_size)
+                .centerInside()
                 .into(holder.image);
+    }
+
+    public String getStartdateFormatted(String startdate){
+        DateFormat ff = new SimpleDateFormat("dd/MM/yyyy");
+        DateFormat fi = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        try {
+            Date date = fi.parse(startdate);
+            return ff.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     @Override
