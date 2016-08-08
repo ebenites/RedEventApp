@@ -32,5 +32,12 @@
     <string name="login_welcome_back">"Welcome back, "</string>
     <string name="topic_empty_topics_selected_message">You must selected any topic.</string>
 
+    <string name="event_price">S/</string>
+    <string name="event_rating_1">1</string>
+    <string name="event_rating_2">2</string>
+    <string name="event_rating_3">3</string>
+    <string name="event_rating_4">4</string>
+    <string name="event_rating_5">5</string>
+
 
 </resources>

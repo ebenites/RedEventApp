@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -36,17 +37,17 @@ import retrofit2.Response;
 
 public class EventsFragment extends Fragment {
 
-    private Activity mActivity;
+    private MainActivity mActivity;
     private RecyclerView recyclerView;
     private EventAdapter mAdapter;
 
     private List<Event> eventList = new ArrayList<>();
-
+    private User mUser;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof Activity){
-            mActivity = (Activity) context;
+            mActivity = (MainActivity) context;
         }
     }
 
@@ -56,8 +57,14 @@ public class EventsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_events, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.event_recycler_view);
+        mUser = SugarRecord.first(User.class);
 
-        mAdapter = new EventAdapter(eventList);
+        mAdapter = new EventAdapter(eventList, new EventAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Event item) {
+                showDetail(item);
+            }
+        });
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -70,12 +77,18 @@ public class EventsFragment extends Fragment {
         return view;
     }
 
+    private void showDetail(Event event) {
+        FragmentTransaction ft = mActivity.getSupportFragmentManager().beginTransaction();
+        EventDetailFragment f = EventDetailFragment.getInstance(event, mUser.getId());
+        ft.replace(R.id.flContent, f);
+        ft.commit();
+    }
+
     private void callRequest(){
         try {
 
             RedEventService service = RedEventServiceGenerator.createService();
-            User user = SugarRecord.first(User.class);
-            Call<List<Event>> call = service.getEvents(user.getId());
+            Call<List<Event>> call = service.getEvents(mUser.getId());
 
             call.enqueue(new Callback<List<Event>>() {
                 @Override

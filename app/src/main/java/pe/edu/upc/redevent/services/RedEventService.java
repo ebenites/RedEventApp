@@ -5,6 +5,9 @@ import java.util.List;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import pe.edu.upc.redevent.models.APIMessage;
+
+import pe.edu.upc.redevent.models.APISuccess;
+
 import pe.edu.upc.redevent.models.Event;
 import pe.edu.upc.redevent.models.Topic;
 import pe.edu.upc.redevent.models.User;
@@ -15,7 +18,10 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+
+import retrofit2.http.PUT;
 import retrofit2.http.Part;
+
 import retrofit2.http.Path;
 
 /**
@@ -36,10 +42,17 @@ public interface RedEventService {
     @GET("/api/users/{id}/events")
     Call<List<Event>> getEvents(@Path("id") long userId);
 
+
     @POST("/api/users/{id}/topics")
     Call<APIMessage> savePreferences(@Path("id") long userId, @Body List<Long> topics);
 
     @GET("/api/topics")
     Call<List<Topic>> getTopics();
+
+    @PUT("/api/users/{userid}/events/{eventid}")
+    Call<APISuccess> checking(@Path("userid") String userid, @Path("eventid") String eventid);
+
+    @PUT("/api/users/{userid}/events/{eventid}/{rating}")
+    Call<APISuccess> rating(@Path("userid") String userid, @Path("eventid") String eventid, @Path("rating") Integer rating);
 
 }

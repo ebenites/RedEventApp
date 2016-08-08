@@ -2,11 +2,14 @@ package pe.edu.upc.redevent.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class Event {
+public class Event implements Serializable {
+
+    private int id;
     private String name;
     private String description;
     private String category;
@@ -17,6 +20,7 @@ public class Event {
     private int maxattendees;
     private String status;
     private String image;
+    private String price;
 
     @SerializedName("topics")
     private Topic topic;
@@ -118,6 +122,21 @@ public class Event {
         this.topic = topic;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
 }
 
 
