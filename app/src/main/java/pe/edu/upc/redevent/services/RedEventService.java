@@ -36,6 +36,6 @@ public interface RedEventService {
     Call<APISuccess> checking(@Path("userid") String userid, @Path("eventid") String eventid);
 
     @PUT("/api/users/{userid}/events/{eventid}/{rating}")
-    Call<APISuccess> rating(@Path("userid") String userid, @Path("eventid") String eventid, @Field("rating") Number rating);
+    Call<APISuccess> rating(@Path("userid") String userid, @Path("eventid") String eventid, @Path("rating") Integer rating);
 
 }

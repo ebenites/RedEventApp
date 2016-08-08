@@ -85,6 +85,8 @@ public class EventDetailActivity extends AppCompatActivity {
             String datevalueEvent= (String) extras.get("dateValueEvent");
             String addressEvent= (String) extras.get("addressEvent");
 
+
+
             imageURL = RedEventService.API_BASE_URL + imageURL;
 
             mImageEvent = (ImageView) findViewById(R.id.imageEvent);
@@ -111,6 +113,7 @@ public class EventDetailActivity extends AppCompatActivity {
         });
 
         mCheckInButton = (Button) findViewById(R.id.checking_button);
+
         mCheckInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,7 +124,7 @@ public class EventDetailActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<APISuccess> call, Response<APISuccess> response) {
                         int statusCode = response.code();
-                        Log.d(MainActivity.class.getSimpleName(), "HTTP status code: " + statusCode);
+                        Log.d(EventDetailActivity.class.getSimpleName(), "HTTP status code: " + statusCode);
 
                         if(response.isSuccessful()) {
 
@@ -143,18 +146,21 @@ public class EventDetailActivity extends AppCompatActivity {
 
                 });
 
-
-
                 displayQuestionRating();
+                mCheckInButton.setVisibility(View.INVISIBLE);
+
             }
         });
 
-        mCheckInButton.setVisibility(status.equals("3") ? View.INVISIBLE : View.VISIBLE);
-        mvalue_button.setVisibility(status.equals("3") ? View.VISIBLE : View.INVISIBLE);
+        mCheckInButton.setVisibility(status.equals("2") ? View.INVISIBLE : View.VISIBLE);
+        mvalue_button.setVisibility(status.equals("2") ? View.VISIBLE : View.INVISIBLE);
+
 
     }
 
-    private void updateCurrentValue(Number value) {
+    private void updateCurrentValue(Integer value) {
+
+        Log.d(MainActivity.class.getSimpleName(), "Rating: " + value.toString());
 
         RedEventService service = RedEventServiceGenerator.createService();
 
@@ -164,30 +170,29 @@ public class EventDetailActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<APISuccess> call, Response<APISuccess> response) {
                 int statusCode = response.code();
-                Log.d(MainActivity.class.getSimpleName(), "HTTP status code: " + statusCode);
+                Log.d(EventDetailActivity.class.getSimpleName(), "HTTP status code: " + statusCode);
 
                 if(response.isSuccessful()) {
 
                     APISuccess APISuccess = response.body();
-                    Log.e(this.getClass().getSimpleName(), "APISuccess " +  APISuccess.getMessage());
+                    Log.e(EventDetailActivity.this.getClass().getSimpleName(), "APISuccess " +  APISuccess.getMessage());
 
                 }else{
                     // Best Practice APIError: https://futurestud.io/blog/retrofit-2-simple-error-handling
                     APIError error = APIError.parseError(response);
-                    Log.e(this.getClass().getSimpleName(), "ApiError " + error.getStatus() + ":" + error.getMessage());
+                    Log.e(EventDetailActivity.this.getClass().getSimpleName(), "ApiError " + error.getStatus() + ":" + error.getMessage());
                 }
             }
 
             @Override
             public void onFailure(Call<APISuccess> call, Throwable t) {
-                Log.e(this.getClass().getSimpleName(), "onFailure:" + t.getMessage());
+                Log.e(EventDetailActivity.this.getClass().getSimpleName(), "onFailure:" + t.getMessage());
                 t.printStackTrace();
             }
 
         });
 
-        startActivity(new Intent(EventDetailActivity.this, TopicActivity.class));
-        finish();
+
 
     }
 
@@ -230,6 +235,7 @@ public class EventDetailActivity extends AppCompatActivity {
         inputRatingEvent.setNumStars(5);
         inputRatingEvent.setStepSize((float)1);
         inputRatingEvent.setRating(3);
+        statusRatingEvent.setText(R.string.event_rating_3);
 
         inputRatingEvent.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
@@ -269,9 +275,12 @@ public class EventDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 float rating = inputRatingEvent.getRating();
-                Number ratingValue =  Float.floatToIntBits(rating);
+                Integer ratingValue =  (int) rating;
                 updateCurrentValue(ratingValue);
                 mvalue_button.setVisibility(View.INVISIBLE);
+                startActivity(new Intent(EventDetailActivity.this, TopicActivity.class));
+                finish();
+
             }
         });
         alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
