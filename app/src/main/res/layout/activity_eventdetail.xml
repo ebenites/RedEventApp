@@ -61,15 +61,31 @@
         android:layout_toEndOf="@+id/dateEvent"
         android:layout_alignBottom="@+id/dateEvent" />
 
+    <TextView
+        android:layout_width="70dp"
+        android:layout_height="25dp"
+        android:text="@string/event_price"
+        android:id="@+id/priceEvent"
+        android:layout_below="@+id/dateEvent"
+        android:layout_alignParentStart="true" />
 
+    <TextView
+        android:layout_width="70dp"
+        android:layout_height="25dp"
+        android:text="0.00"
+        android:id="@+id/pricevalueEvent"
+        android:layout_below="@+id/dateEvent"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/priceEvent"
+        android:layout_alignBottom="@+id/priceEvent" />
 
 
     <TextView
         android:layout_width="70dp"
-        android:layout_height="75dp"
+        android:layout_height="50dp"
         android:text="@string/event_address"
         android:id="@+id/addressEvent"
-        android:layout_below="@+id/dateEvent"
+        android:layout_below="@+id/priceEvent"
         android:layout_alignParentStart="true" />
 
     <TextView
@@ -77,7 +93,7 @@
         android:layout_height="50dp"
         android:text="Avenida Javier Prado 1144 San Isidro"
         android:id="@+id/addressvalueEvent"
-        android:layout_below="@+id/dateEvent"
+        android:layout_below="@+id/priceEvent"
         android:layout_alignParentEnd="true"
         android:layout_toEndOf="@+id/addressEvent"
         android:layout_alignBottom="@+id/addressEvent" />

@@ -32,6 +32,7 @@ public class SplashActivity extends AppCompatActivity {
                 explicit_intent.putExtra("imageURL","/uploads/images/events/google-io.jpg");
                 explicit_intent.putExtra("descriptionEvent","Road to Ultra, el exitoso festival electrónico que en 2015 logró congregar a casi 20 mil personas en su primera edición, regresará a Lima el 7 de octubre de 2016 como parte del circuito Ultra de Latinoamérica.");
                 explicit_intent.putExtra("dateValueEvent","2016-10-07 15:00:00");
+                explicit_intent.putExtra("priceValueEvent","175.00");
                 explicit_intent.putExtra("addressEvent","Circuito de playas de la Costa Verde");
 
                 startActivity(explicit_intent);

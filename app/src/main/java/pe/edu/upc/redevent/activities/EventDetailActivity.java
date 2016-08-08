@@ -50,6 +50,7 @@ public class EventDetailActivity extends AppCompatActivity {
     private ImageView mImageEvent;
     private TextView mDescriptionEvent;
     private TextView mDateEvent;
+    private TextView mPriceEvent;
     private TextView mAddressEvent;
     private Button mvalue_button;
     private Button mCheckInButton;
@@ -73,6 +74,7 @@ public class EventDetailActivity extends AppCompatActivity {
         mDescriptionEvent = (TextView) findViewById(R.id.descriptionEvent);
         mDateEvent = (TextView) findViewById(R.id.datevalueEvent);
         mAddressEvent = (TextView) findViewById(R.id.addressvalueEvent);
+        mPriceEvent = (TextView) findViewById(R.id.pricevalueEvent);
 
         if (extras != null) {
 
@@ -84,6 +86,7 @@ public class EventDetailActivity extends AppCompatActivity {
             String descriptionEvent=(String)extras.get("descriptionEvent");
             String datevalueEvent= (String) extras.get("dateValueEvent");
             String addressEvent= (String) extras.get("addressEvent");
+            String priceValueEvent = (String) extras.get("priceValueEvent");
 
 
 
@@ -100,6 +103,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
             mDescriptionEvent.setText(descriptionEvent);
             mDateEvent.setText(datevalueEvent);
+            mPriceEvent.setText(priceValueEvent);
             mAddressEvent.setText(addressEvent);
 
         }
