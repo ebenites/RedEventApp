@@ -2,7 +2,6 @@ package pe.edu.upc.redevent.ui.fragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -18,19 +17,16 @@ import android.widget.Toast;
 import com.orm.SugarRecord;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import pe.edu.upc.redevent.R;
 import pe.edu.upc.redevent.activities.MainActivity;
-import pe.edu.upc.redevent.activities.TopicActivity;
 import pe.edu.upc.redevent.models.APIError;
 import pe.edu.upc.redevent.models.Event;
 import pe.edu.upc.redevent.models.User;
 import pe.edu.upc.redevent.services.RedEventService;
 import pe.edu.upc.redevent.services.RedEventServiceGenerator;
 import pe.edu.upc.redevent.ui.adapter.EventAdapter;
-import pe.edu.upc.redevent.utils.PreferencesManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -79,7 +75,7 @@ public class EventsFragment extends Fragment {
 
     private void showDetail(Event event) {
         FragmentTransaction ft = mActivity.getSupportFragmentManager().beginTransaction();
-        EventDetailFragment f = EventDetailFragment.getInstance(event, mUser.getId());
+        EventDetailMainFragment f = EventDetailMainFragment.getInstance(event, mUser.getId());
         ft.replace(R.id.flContent, f);
         ft.commit();
     }

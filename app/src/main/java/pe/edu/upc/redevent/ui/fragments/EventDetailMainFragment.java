@@ -1,7 +1,6 @@
 package pe.edu.upc.redevent.ui.fragments;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -30,7 +29,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class EventDetailFragment extends  Fragment {
+public class EventDetailMainFragment extends  Fragment {
 
     private ImageView mImageEvent;
     private TextView mDescriptionEvent;
@@ -48,8 +47,8 @@ public class EventDetailFragment extends  Fragment {
 
     private Event mEvent;
 
-    public static EventDetailFragment getInstance(Event event, long userId) {
-        EventDetailFragment f = new EventDetailFragment();
+    public static EventDetailMainFragment getInstance(Event event, long userId) {
+        EventDetailMainFragment f = new EventDetailMainFragment();
         Bundle args = new Bundle();
         args.putSerializable("event", event);
         args.putLong("users_id", userId);
@@ -126,7 +125,7 @@ public class EventDetailFragment extends  Fragment {
                     @Override
                     public void onResponse(Call<APISuccess> call, Response<APISuccess> response) {
                         int statusCode = response.code();
-                        Log.d(EventDetailFragment.class.getSimpleName(), "HTTP status code: " + statusCode);
+                        Log.d(EventDetailMainFragment.class.getSimpleName(), "HTTP status code: " + statusCode);
 
                         if(response.isSuccessful()) {
 
@@ -163,7 +162,7 @@ public class EventDetailFragment extends  Fragment {
 
     private void updateCurrentValue(Integer value) {
 
-        Log.d(EventDetailFragment.class.getSimpleName(), "Rating: " + value.toString());
+        Log.d(EventDetailMainFragment.class.getSimpleName(), "Rating: " + value.toString());
 
         RedEventService service = RedEventServiceGenerator.createService();
 
@@ -173,23 +172,23 @@ public class EventDetailFragment extends  Fragment {
             @Override
             public void onResponse(Call<APISuccess> call, Response<APISuccess> response) {
                 int statusCode = response.code();
-                Log.d(EventDetailFragment.class.getSimpleName(), "HTTP status code: " + statusCode);
+                Log.d(EventDetailMainFragment.class.getSimpleName(), "HTTP status code: " + statusCode);
 
                 if(response.isSuccessful()) {
 
                     APISuccess APISuccess = response.body();
-                    Log.e(EventDetailFragment.this.getClass().getSimpleName(), "APISuccess " +  APISuccess.getMessage());
+                    Log.e(EventDetailMainFragment.this.getClass().getSimpleName(), "APISuccess " +  APISuccess.getMessage());
 
                 }else{
                     // Best Practice APIError: https://futurestud.io/blog/retrofit-2-simple-error-handling
                     APIError error = APIError.parseError(response);
-                    Log.e(EventDetailFragment.this.getClass().getSimpleName(), "ApiError " + error.getStatus() + ":" + error.getMessage());
+                    Log.e(EventDetailMainFragment.this.getClass().getSimpleName(), "ApiError " + error.getStatus() + ":" + error.getMessage());
                 }
             }
 
             @Override
             public void onFailure(Call<APISuccess> call, Throwable t) {
-                Log.e(EventDetailFragment.class.getSimpleName(), "onFailure:" + t.getMessage());
+                Log.e(EventDetailMainFragment.class.getSimpleName(), "onFailure:" + t.getMessage());
                 t.printStackTrace();
             }
 
