@@ -185,8 +185,8 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
 
         try {
 
-            RedEventService service = RedEventServiceGenerator.createService();
 
+            RedEventService service = RedEventServiceGenerator.createService();
             Call<User> call = service.login(email, password);
 
             call.enqueue(new Callback<User>() {

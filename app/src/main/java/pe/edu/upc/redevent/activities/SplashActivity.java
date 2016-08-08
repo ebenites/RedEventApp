@@ -20,7 +20,21 @@ public class SplashActivity extends AppCompatActivity {
 
         new Handler().postDelayed(new Runnable() {
             public void run() {
-                startActivity(new Intent(SplashActivity.this, LoginActivity.class));
+
+                //startActivity(new Intent (SplashActivity.this,LoginActivity.class));
+
+                Intent explicit_intent;
+                explicit_intent = new Intent(SplashActivity.this, EventDetailActivity.class);
+
+                explicit_intent.putExtra("users_id","1");
+                explicit_intent.putExtra("events_id","2");
+                explicit_intent.putExtra("status","1");
+                explicit_intent.putExtra("imageURL","/uploads/images/events/google-io.jpg");
+                explicit_intent.putExtra("descriptionEvent","Road to Ultra, el exitoso festival electrónico que en 2015 logró congregar a casi 20 mil personas en su primera edición, regresará a Lima el 7 de octubre de 2016 como parte del circuito Ultra de Latinoamérica.");
+                explicit_intent.putExtra("dateValueEvent","2016-10-07 15:00:00");
+                explicit_intent.putExtra("addressEvent","Circuito de playas de la Costa Verde");
+
+                startActivity(explicit_intent);
                 finish();
             }
         }, SPLASH_DISPLAY_LENGTH);

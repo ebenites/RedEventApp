@@ -1,5 +1,7 @@
 package pe.edu.upc.redevent.services;
 
+        import android.content.ClipData;
+
         import java.util.List;
 
         import pe.edu.upc.redevent.models.EventDetail;
@@ -12,6 +14,7 @@ package pe.edu.upc.redevent.services;
         import retrofit2.http.GET;
         import retrofit2.http.POST;
         import retrofit2.http.PUT;
+        import retrofit2.http.Body;
 
 /**
  * Created by ebenites on 05/08/2016.
@@ -28,16 +31,10 @@ public interface RedEventService {
     @POST("/api/glogin")
     Call<User> glogin(@Field("email") String email, @Field("googleid") String googleid, @Field("fullname") String fullname);
 
-    @FormUrlEncoded
-    @POST("/api/users/{userid}/events/{eventid}")
-    Call<EventDetail> event(@Path("userid") String userid, @Path("eventid") String eventid);
-
-    @FormUrlEncoded
     @PUT("/api/users/{userid}/events/{eventid}")
-    void checking(@Path("userid") String userid, @Path("eventid") String eventid);
+    Call<EventDetail> checking(@Path("userid") String userid, @Path("eventid") String eventid, @Body EventDetail users);
 
-    @FormUrlEncoded
     @PUT("/api/users/{userid}/events/{eventid}/{rating}")
-    void rating(@Path("userid") String userid, @Path("eventid") String eventid, @Field("rating") Number rating);
+    Call<EventDetail> rating(@Path("userid") String userid, @Path("eventid") String eventid, @Field("rating") Number rating, @Body EventDetail users);
 
 }

@@ -3,8 +3,11 @@ package pe.edu.upc.redevent.tasks;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.StrictMode;
+import android.util.Log;
 import android.widget.ImageView;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -46,5 +49,11 @@ public class ImageLoadTask extends AsyncTask<Void, Void, Bitmap> {
         super.onPostExecute(result);
         imageView.setImageBitmap(result);
     }
+
+
+
+
+
+
 
 }

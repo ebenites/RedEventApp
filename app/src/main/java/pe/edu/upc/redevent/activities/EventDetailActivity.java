@@ -1,7 +1,9 @@
 package pe.edu.upc.redevent.activities;
 
-
+import android.content.res.ColorStateList;
+import android.os.PersistableBundle;
 import android.app.AlertDialog;
+import android.app.assist.AssistContent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,6 +12,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.SearchEvent;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -17,21 +20,25 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.app.SharedElementCallback;
 import android.widget.Toast;
+
+
+import com.orm.SugarRecord;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import okhttp3.MediaType;
 import pe.edu.upc.redevent.R;
 
 import pe.edu.upc.redevent.models.APIError;
-import pe.edu.upc.redevent.models.EventDetail;
+import pe.edu.upc.redevent.models.User;
 import pe.edu.upc.redevent.services.RedEventService;
 import pe.edu.upc.redevent.services.RedEventServiceGenerator;
-
+import pe.edu.upc.redevent.utils.PreferencesManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -41,7 +48,6 @@ public class EventDetailActivity extends AppCompatActivity {
     private ImageView mImageEvent;
     private TextView mDescriptionEvent;
     private TextView mDateEvent;
-    private TextView mHourEvent;
     private TextView mAddressEvent;
     private Button mvalue_button;
     private Button mCheckInButton;
@@ -50,14 +56,13 @@ public class EventDetailActivity extends AppCompatActivity {
     private String eventId;
     private String status;
 
-    //TextView nameTextView;
     float userrating;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_event);
+        setContentView(R.layout.activity_eventdetail);
 
         Intent intent = getIntent();
 
@@ -65,10 +70,9 @@ public class EventDetailActivity extends AppCompatActivity {
 
         mDescriptionEvent = (TextView) findViewById(R.id.descriptionEvent);
         mDateEvent = (TextView) findViewById(R.id.datevalueEvent);
-        mHourEvent = (TextView) findViewById(R.id.hourvalueEvent);
         mAddressEvent = (TextView) findViewById(R.id.addressvalueEvent);
 
-        if (extras != null) {//ver si contiene datos
+        if (extras != null) {
 
             userId = (String)extras.get("users_id");
             eventId = (String)extras.get("events_id");
@@ -76,16 +80,22 @@ public class EventDetailActivity extends AppCompatActivity {
 
             String imageURL= (String) extras.get("imageURL");
             String descriptionEvent=(String)extras.get("descriptionEvent");
-            String datevalueEvent= (String) extras.get("datevalueEvent");
-            String hourvalueEvent= (String) extras.get("hourvalueEvent");
+            String datevalueEvent= (String) extras.get("dateValueEvent");
             String addressEvent= (String) extras.get("addressEvent");
 
-            mImageEvent = (ImageView) findViewById(R.id.imageView);
-            mImageEvent.setImageBitmap(getBitmapFromURL(imageURL));
+            imageURL = RedEventService.API_BASE_URL + imageURL;
+
+            mImageEvent = (ImageView) findViewById(R.id.imageEvent);
+
+            Picasso.with(this.getBaseContext())
+                    .load(imageURL)
+                    .error(R.drawable.image_default)
+                    .into(mImageEvent);
+
+           //mImageEvent.setImageBitmap(getBitmapFromURL(imageURL));
 
             mDescriptionEvent.setText(descriptionEvent);
             mDateEvent.setText(datevalueEvent);
-            mHourEvent.setText(hourvalueEvent);
             mAddressEvent.setText(addressEvent);
 
         }
@@ -102,24 +112,27 @@ public class EventDetailActivity extends AppCompatActivity {
         mCheckInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                RedEventService service = RedEventServiceGenerator.createService();
+                service.checking(userId, eventId);
                 displayQuestionRating();
             }
         });
 
-        mCheckInButton.setVisibility(status == "3" ? View.INVISIBLE : View.VISIBLE);
-        mvalue_button.setVisibility(status == "3" ? View.VISIBLE : View.INVISIBLE);
+        mCheckInButton.setVisibility(status.equals("3") ? View.INVISIBLE : View.VISIBLE);
+        mvalue_button.setVisibility(status.equals("3") ? View.VISIBLE : View.INVISIBLE);
 
     }
 
-    private void updateCurrentValue(String value) {
+    private void updateCurrentValue(Number value) {
 
         RedEventService service = RedEventServiceGenerator.createService();
+
+        service.rating(userId, eventId, value);
 
         startActivity(new Intent(EventDetailActivity.this, TopicActivity.class));
         finish();
 
     }
-
 
     private void displayQuestionRating() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -150,7 +163,6 @@ public class EventDetailActivity extends AppCompatActivity {
 
         final RatingBar inputRatingEvent = new RatingBar(this);
         final TextView statusRatingEvent = new TextView(this);
-
 
         LinearLayout.LayoutParams ratingParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         ratingParams.gravity = Gravity.CENTER;
@@ -200,7 +212,7 @@ public class EventDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 float rating = inputRatingEvent.getRating();
-                String ratingValue =  Float.toString(rating);
+                Number ratingValue =  Float.floatToIntBits(rating);
                 updateCurrentValue(ratingValue);
                 mvalue_button.setVisibility(View.INVISIBLE);
             }
@@ -215,30 +227,4 @@ public class EventDetailActivity extends AppCompatActivity {
 
     }
 
-    private Bitmap getBitmapFromURL(String src) {
-        try {
-
-            if (android.os.Build.VERSION.SDK_INT > 9) {
-                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                StrictMode.setThreadPolicy(policy);
-            }
-
-            Log.e("src", src);
-            URL url = new URL(src);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000 );
-            conn.setConnectTimeout(15000);
-            conn.setRequestMethod("GET");
-            conn.setDoInput(true);
-            conn.connect();
-            InputStream input = conn.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            Log.e("Bitmap", "returned");
-            return myBitmap;
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("Exception", e.getMessage());
-            return null;
-        }
-    }
-}
+ }
