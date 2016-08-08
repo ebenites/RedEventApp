@@ -1,20 +1,28 @@
 package pe.edu.upc.redevent.models;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
 
 public class Event {
     private String name;
     private String description;
     private String category;
-    private Date dateStart;
+    private String latitude;
+    private String longitude;
+    private String address;
+    private String startdate;
+    private int maxattendees;
+    private String status;
+    private String image;
 
-    public Event(String name, String category, Date dateStart){
+    private Topics topics;
+
+    public Event(String name, String category, String startdate){
         super();
         this.name = name;
         this.category = category;
-        this.dateStart = dateStart;
+        this.startdate = startdate;
     }
 
     public String getName() {
@@ -33,16 +41,77 @@ public class Event {
         this.category = category;
     }
 
-    public Date getDateStart() {
-        return dateStart;
+
+    public String getDescription() {
+        return description;
     }
 
-    public void setDateStart(Date dateStart) {
-        this.dateStart = dateStart;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getDateStartConverted(){
-        DateFormat ff = new SimpleDateFormat("dd/MM/yyyy");
-        return ff.format(dateStart);
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getStartdate() {
+        return startdate;
+    }
+
+    public void setStartdate(String startdate) {
+        this.startdate = startdate;
+    }
+
+    public int getMaxattendees() {
+        return maxattendees;
+    }
+
+    public void setMaxattendees(int maxattendees) {
+        this.maxattendees = maxattendees;
+    }
+
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public void setTopics(Topics topics) {
+        this.topics = topics;
+    }
+
+    public Topics getTopics() {
+        return topics;
     }
 }
