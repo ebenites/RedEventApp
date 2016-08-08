@@ -42,6 +42,8 @@ public interface RedEventService {
     @GET("/api/users/{id}/events")
     Call<List<Event>> getEvents(@Path("id") long userId);
 
+    @GET("/api/users/{id}/myevents")
+    Call<List<Event>> getMyEvents(@Path("id") long userId);
 
     @POST("/api/users/{id}/topics")
     Call<APIMessage> savePreferences(@Path("id") long userId, @Body List<Long> topics);
@@ -54,5 +56,8 @@ public interface RedEventService {
 
     @PUT("/api/users/{userid}/events/{eventid}/{rating}")
     Call<APISuccess> rating(@Path("userid") String userid, @Path("eventid") String eventid, @Path("rating") Integer rating);
+
+    @POST("/api/users/{userid}/events/{eventid}")
+    Call<String> joinEvent(@Path("userid") String userid, @Path("eventid") String eventid );
 
 }

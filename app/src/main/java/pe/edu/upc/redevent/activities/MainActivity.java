@@ -1,5 +1,6 @@
 package pe.edu.upc.redevent.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -91,6 +92,10 @@ public class MainActivity extends AppCompatActivity
                 SugarRecord.deleteAll(User.class);
                 finish();
                 return true;
+            case R.id.nav_topic:
+                Intent i = new Intent(getApplicationContext(), TopicActivity.class);
+                startActivity(i);
+                fragmentClass = EventsFragment.class;
             default:
                 fragmentClass = EventsFragment.class;
         }

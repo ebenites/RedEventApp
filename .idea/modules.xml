@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/RedEvent.iml" filepath="$PROJECT_DIR$/RedEvent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RedEventApp.iml" filepath="$PROJECT_DIR$/RedEventApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

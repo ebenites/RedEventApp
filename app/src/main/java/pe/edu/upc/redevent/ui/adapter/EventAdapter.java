@@ -1,5 +1,8 @@
 package pe.edu.upc.redevent.ui.adapter;
 
+import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,77 +22,66 @@ import java.util.List;
 import pe.edu.upc.redevent.R;
 import pe.edu.upc.redevent.models.Event;
 import pe.edu.upc.redevent.services.RedEventService;
+import pe.edu.upc.redevent.ui.fragments.EventDetailMainFragment;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.MyViewHolder> {
 
+    private AppCompatActivity mActivity;
     private List<Event> eventList;
 
-    public interface OnItemClickListener {
-        void onItemClick(Event event);
-    }
 
-    private final OnItemClickListener listener;
-
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView title, category, date;
         public ImageView image;
-        private Button btnSeeDetail;
 
-        public MyViewHolder(View itemView) {
-            super(itemView);
+        public MyViewHolder(View view) {
+            super(view);
+            title = (TextView) view.findViewById(R.id.title);
+            category = (TextView) view.findViewById(R.id.category);
+            date = (TextView) view.findViewById(R.id.date);
+            image = (ImageView) view.findViewById(R.id.event_image);
+            view.setOnClickListener(this);
+        }
 
-            title = (TextView) itemView.findViewById(R.id.title);
-            category = (TextView) itemView.findViewById(R.id.category);
-            date = (TextView) itemView.findViewById(R.id.date);
-            image = (ImageView) itemView.findViewById(R.id.event_image);
-            btnSeeDetail = (Button) itemView.findViewById(R.id.btnSee);
+        @Override
+        public void onClick(View view) {
+            Log.d("RedEvent", " position " + eventList.get(this.getAdapterPosition()).getName());
+
+            FragmentManager fragmentManager = mActivity.getSupportFragmentManager();
+            EventDetailMainFragment fragment = new EventDetailMainFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("EVENT", eventList.get(this.getAdapterPosition()));
+            fragment.setArguments(bundle);
+            fragmentManager.beginTransaction().replace(R.id.flContent, fragment).addToBackStack(null).commit();
+
         }
     }
 
-    public EventAdapter(List<Event> eventList, OnItemClickListener listener) {
+    public EventAdapter(List<Event> eventList, AppCompatActivity mActivity) {
         this.eventList = eventList;
-        this.listener = listener;
+        this.mActivity = mActivity;
     }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View itemView = LayoutInflater.from(parent.getContext())
+        View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.event_list_row, parent, false);
+
         return new MyViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        final Event event = eventList.get(position);
-//        holder.bind(event, listener);
+        Event event = eventList.get(position);
         holder.title.setText(event.getName());
-        holder.category.setText(String.valueOf(event.getTopic().getName()));
-        holder.date.setText(getStartdateFormatted(event.getStartdate()));
-        holder.btnSeeDetail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.onItemClick(event);
-            }
-        });
-
+        holder.category.setText(String.valueOf(event.getMaxattendees()));
+        holder.date.setText(event.getStartdate());
         Picasso.with(holder.itemView.getContext()).
                 load(RedEventService.API_BASE_URL.concat(event.getImage()))
                 .placeholder(R.drawable.image_default)
                 .resizeDimen(R.dimen.list_detail_image_size, R.dimen.list_detail_image_size)
                 .centerInside()
                 .into(holder.image);
-    }
-
-    public String getStartdateFormatted(String startdate){
-        DateFormat ff = new SimpleDateFormat("dd/MM/yyyy");
-        DateFormat fi = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        try {
-            Date date = fi.parse(startdate);
-            return ff.format(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return "";
-        }
     }
 
     @Override

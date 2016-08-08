@@ -2,11 +2,13 @@ package pe.edu.upc.redevent.models;
 
 import com.orm.dsl.Table;
 
+import java.io.Serializable;
+
 /**
  * Created by ebenites on 05/08/2016.
  */
 @Table
-public class Topic{
+public class Topic implements Serializable {
 
     private Long id;
 

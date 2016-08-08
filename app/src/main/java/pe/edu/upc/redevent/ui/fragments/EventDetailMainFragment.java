@@ -1,6 +1,7 @@
 package pe.edu.upc.redevent.ui.fragments;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -16,12 +17,17 @@ import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.orm.SugarRecord;
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 import pe.edu.upc.redevent.R;
+import pe.edu.upc.redevent.activities.MainActivity;
 import pe.edu.upc.redevent.models.APIError;
 import pe.edu.upc.redevent.models.APISuccess;
 import pe.edu.upc.redevent.models.Event;
+import pe.edu.upc.redevent.models.User;
 import pe.edu.upc.redevent.services.RedEventService;
 import pe.edu.upc.redevent.services.RedEventServiceGenerator;
 import retrofit2.Call;
@@ -31,265 +37,92 @@ import retrofit2.Response;
 
 public class EventDetailMainFragment extends  Fragment {
 
-    private ImageView mImageEvent;
-    private TextView mDescriptionEvent;
-    private TextView mDateEvent;
-    private TextView mPriceEvent;
-    private TextView mAddressEvent;
-    private Button mvalue_button;
-    private Button mCheckInButton;
-
-    private String userId;
-    private String eventId;
-    private String status;
-
-    float userrating;
-
-    private Event mEvent;
-
-    public static EventDetailMainFragment getInstance(Event event, long userId) {
-        EventDetailMainFragment f = new EventDetailMainFragment();
-        Bundle args = new Bundle();
-        args.putSerializable("event", event);
-        args.putLong("users_id", userId);
-        f.setArguments(args);
-        return f;
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private Event event;
+    private ImageView imageDetailEvent;
+    private TextView descriptionDetailEvent, dateDetailEvent, hourDetailEvent, addressDetailEvent;
+    public EventDetailMainFragment() {
+        // Required empty public constructor
     }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            userId = String.valueOf(getArguments().getLong("users_id"));
-            mEvent =  (Event) getArguments().getSerializable("event");
-        }
-    }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_event_detail, container, false);
+        View view= inflater.inflate(R.layout.fragment_event_detail_main, container, false);
+        event = (Event)getArguments().getSerializable("EVENT");
+        imageDetailEvent = (ImageView) view.findViewById(R.id.imageDetailEvent);
+        descriptionDetailEvent = (TextView) view.findViewById(R.id.descriptionDetailEvent);
+        dateDetailEvent = (TextView) view.findViewById(R.id.dateDetailEvent);
+        hourDetailEvent = (TextView) view.findViewById(R.id.hourDetailEvent);
+        addressDetailEvent = (TextView) view.findViewById(R.id.addressDetailEvent);
+        Button buttonJoin = (Button) view.findViewById(R.id.buttonJoin);
+        descriptionDetailEvent.setText(event.getDescription());
+        addressDetailEvent.setText(event.getAddress());
+        Picasso.with(view.getContext()).
+                load(RedEventService.API_BASE_URL.concat(event.getImage()))
+                .resize(120, 120)
+                .centerCrop()
+                .into(imageDetailEvent);
 
-        mDescriptionEvent = (TextView) view.findViewById(R.id.descriptionEvent);
-        mDateEvent = (TextView) view.findViewById(R.id.datevalueEvent);
-        mAddressEvent = (TextView) view.findViewById(R.id.addressvalueEvent);
-        mPriceEvent = (TextView) view.findViewById(R.id.pricevalueEvent);
-
-        if (getArguments() != null) {
-
-            eventId = String.valueOf(mEvent.getId());
-            status =  mEvent.getStatus();
-
-            String imageURL= mEvent.getImage();
-            String descriptionEvent=mEvent.getDescription();
-            String dateValueEvent = mEvent.getStartdate();
-            String addressEvent= mEvent.getAddress();
-            String priceValueEvent = mEvent.getPrice();
-
-            imageURL = RedEventService.API_BASE_URL + imageURL;
-
-            mImageEvent = (ImageView) view.findViewById(R.id.imageEvent);
-
-            Picasso.with(this.getActivity())
-                    .load(imageURL)
-                    .error(R.drawable.image_default)
-                    .into(mImageEvent);
-
-
-            mDescriptionEvent.setText(descriptionEvent);
-            mDateEvent.setText(dateValueEvent);
-            mPriceEvent.setText(priceValueEvent);
-            mAddressEvent.setText(addressEvent);
-
-        }
-
-        mvalue_button = (Button) view.findViewById(R.id.value_button);
-        mvalue_button.setOnClickListener(new View.OnClickListener() {
+        buttonJoin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                displayRating();
+                Log.d("RedEvent",  " click join evnt " +event.getName());
+                joinToEvent(event);
             }
         });
-
-        mCheckInButton = (Button)  view.findViewById(R.id.checking_button);
-
-        mCheckInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                RedEventService service = RedEventServiceGenerator.createService();
-                Call<APISuccess> call = service.checking(userId, eventId );
-
-                call.enqueue(new Callback<APISuccess>() {
-                    @Override
-                    public void onResponse(Call<APISuccess> call, Response<APISuccess> response) {
-                        int statusCode = response.code();
-                        Log.d(EventDetailMainFragment.class.getSimpleName(), "HTTP status code: " + statusCode);
-
-                        if(response.isSuccessful()) {
-
-                            APISuccess APISuccess = response.body();
-                            Log.e(this.getClass().getSimpleName(), "APISuccess " +  APISuccess.getMessage());
-
-                        }else{
-                            // Best Practice APIError: https://futurestud.io/blog/retrofit-2-simple-error-handling
-                            APIError error = APIError.parseError(response);
-                            Log.e(this.getClass().getSimpleName(), "ApiError " + error.getStatus() + ":" + error.getMessage());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<APISuccess> call, Throwable t) {
-                        Log.e(this.getClass().getSimpleName(), "onFailure:" + t.getMessage());
-                        t.printStackTrace();
-                    }
-
-                });
-
-                displayQuestionRating();
-                mCheckInButton.setVisibility(View.INVISIBLE);
-
-            }
-        });
-
-        mCheckInButton.setVisibility(status.equals("2") ? View.INVISIBLE : View.VISIBLE);
-        mvalue_button.setVisibility(status.equals("2") ? View.VISIBLE : View.INVISIBLE);
-
         return view;
     }
 
-
-    private void updateCurrentValue(Integer value) {
-
-        Log.d(EventDetailMainFragment.class.getSimpleName(), "Rating: " + value.toString());
-
-        RedEventService service = RedEventServiceGenerator.createService();
-
-        Call<APISuccess> call = service.rating(userId, eventId, value);
-
-        call.enqueue(new Callback<APISuccess>() {
-            @Override
-            public void onResponse(Call<APISuccess> call, Response<APISuccess> response) {
-                int statusCode = response.code();
-                Log.d(EventDetailMainFragment.class.getSimpleName(), "HTTP status code: " + statusCode);
-
-                if(response.isSuccessful()) {
-
-                    APISuccess APISuccess = response.body();
-                    Log.e(EventDetailMainFragment.this.getClass().getSimpleName(), "APISuccess " +  APISuccess.getMessage());
-
-                }else{
-                    // Best Practice APIError: https://futurestud.io/blog/retrofit-2-simple-error-handling
-                    APIError error = APIError.parseError(response);
-                    Log.e(EventDetailMainFragment.this.getClass().getSimpleName(), "ApiError " + error.getStatus() + ":" + error.getMessage());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<APISuccess> call, Throwable t) {
-                Log.e(EventDetailMainFragment.class.getSimpleName(), "onFailure:" + t.getMessage());
-                t.printStackTrace();
-            }
-
-        });
-
-
-
+    public void joinToEvent(Event event){
+        List<User> listUser = SugarRecord.listAll(User.class);
+        for (User user : listUser) {
+            Log.d("RedEvent", " User " +user.getEmail());
+            join(event, user);
+        }
     }
 
-    private void displayQuestionRating() {
-        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-        alert.setTitle("Desea Evaluar el Evento?");
-        alert.setPositiveButton("Evaluar", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //String inputName = input.getText().toString();
-                displayRating();
-            }
-        });
-        alert.setNegativeButton("En Otro Momento", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mvalue_button.setVisibility(View.VISIBLE);
-            }
-        });
-        alert.show();
-    }
+    public void join(Event event, User user){
+        try {
 
-    private void displayRating() {
+            RedEventService service = RedEventServiceGenerator.createService();
 
-        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-        alert.setTitle("Rating Event");
+            Call<String> call = service.joinEvent(""+user.getId(), ""+event.getId());
 
-        LinearLayout layout = new LinearLayout(getContext());
-        layout.setOrientation(LinearLayout.VERTICAL);
+            call.enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    int statusCode = response.code();
+                    Log.d(MainActivity.class.getSimpleName(), "HTTP status code: " + statusCode);
 
-        final RatingBar inputRatingEvent = new RatingBar(getContext());
-        final TextView statusRatingEvent = new TextView(getContext());
+                    if(response.isSuccessful()) {
+                        Intent i = new Intent(getActivity().getApplicationContext(), MainActivity.class);
+                        startActivity(i);
 
-        LinearLayout.LayoutParams ratingParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        ratingParams.gravity = Gravity.CENTER;
+                    }else{
+                        // Best Practice APIError: https://futurestud.io/blog/retrofit-2-simple-error-handling
+                        APIError error = APIError.parseError(response);
+                        Log.e(this.getClass().getSimpleName(), "ApiError " + error.getStatus() + ":" + error.getMessage());
+                    }
 
-        inputRatingEvent.setLayoutParams(ratingParams);
-        statusRatingEvent.setLayoutParams(ratingParams);
-
-        inputRatingEvent.setNumStars(5);
-        inputRatingEvent.setStepSize((float)1);
-        inputRatingEvent.setRating(3);
-        statusRatingEvent.setText(R.string.event_rating_3);
-
-        inputRatingEvent.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-            @Override
-            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-
-                userrating= inputRatingEvent.getRating();
-
-                if(userrating == 0){
-                    inputRatingEvent.setRating(1);
-                }
-                if(userrating == 1){
-                    statusRatingEvent.setText(R.string.event_rating_1);
-                }
-                if(userrating == 2){
-                    statusRatingEvent.setText(R.string.event_rating_2);
-                }
-                if(userrating == 3){
-                    statusRatingEvent.setText(R.string.event_rating_3);
-                }
-                if(userrating == 4){
-                    statusRatingEvent.setText(R.string.event_rating_4);
-                }
-                if(userrating == 5){
-                    statusRatingEvent.setText(R.string.event_rating_5);
                 }
 
-            }
-        });
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+                    // Log error here since request failed
+                    Log.e(this.getClass().getSimpleName(), "onFailure:" + t.getMessage());
+                    t.printStackTrace();
+                }
 
-        layout.addView(inputRatingEvent);
-        layout.addView(statusRatingEvent);
+            });
 
-        alert.setView(layout);
-        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                float rating = inputRatingEvent.getRating();
-                Integer ratingValue =  (int) rating;
-                updateCurrentValue(ratingValue);
-                mvalue_button.setVisibility(View.INVISIBLE);
-//                startActivity(new Intent(EventDetailActivity.this, TopicActivity.class));
-//                finish();
+        } catch (Exception e) {
+            Log.e(this.getClass().getSimpleName(), "Exception!" + e.getMessage());
+            e.printStackTrace();
+        }
 
-            }
-        });
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mvalue_button.setVisibility(View.VISIBLE);
-            }
-        });
-        alert.show();
-
+        Intent i = new Intent(getActivity().getApplicationContext(), MainActivity.class);
+        startActivity(i);
     }
 }

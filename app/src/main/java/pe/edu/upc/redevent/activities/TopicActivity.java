@@ -168,6 +168,9 @@ public class TopicActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(i);
+
     }
 
 }
