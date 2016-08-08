@@ -40,12 +40,13 @@ public class EventsFragment extends Fragment {
     private List<Event> eventList = new ArrayList<>();
     private User mUser;
 
+    private View rootView;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof Activity){
              mActivity = (AppCompatActivity) context;
-
         }
     }
 
@@ -53,22 +54,35 @@ public class EventsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_events, container, false);
-        recyclerView = (RecyclerView) view.findViewById(R.id.event_recycler_view);
-        mAdapter = new EventAdapter(eventList, mActivity);
+        if (rootView == null ) {
+            rootView = inflater.inflate(R.layout.fragment_events, container, false);
+            recyclerView = (RecyclerView) rootView.findViewById(R.id.event_recycler_view);
+            mUser = SugarRecord.first(User.class);
 
-        mUser = SugarRecord.first(User.class);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
+            mAdapter = new EventAdapter(eventList, new EventAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(Event item) {
+                    showDetail(item);
+                }
+            });
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+            recyclerView.setLayoutManager(mLayoutManager);
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setAdapter(mAdapter);
+
 //        prepareMovieData();
 
-        callRequest();
-
-        return view;
+            callRequest();
+        }
+        return rootView;
     }
 
+    private void showDetail(Event event) {
+        FragmentTransaction ft = mActivity.getSupportFragmentManager().beginTransaction();
+        EventDetailMainFragment f = EventDetailMainFragment.getInstance(event, mUser.getId());
+        ft.replace(R.id.flContent, f).addToBackStack(null);
+        ft.commit();
+    }
 
     private void callRequest(){
         try {

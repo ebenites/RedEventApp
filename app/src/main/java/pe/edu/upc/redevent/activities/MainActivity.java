@@ -19,6 +19,7 @@ import pe.edu.upc.redevent.R;
 import pe.edu.upc.redevent.models.User;
 import pe.edu.upc.redevent.ui.fragments.EventsFragment;
 import pe.edu.upc.redevent.ui.fragments.MyEventsFragment;
+import pe.edu.upc.redevent.ui.fragments.ProfileFragment;
 import pe.edu.upc.redevent.utils.PreferencesManager;
 
 public class MainActivity extends AppCompatActivity
@@ -96,6 +97,9 @@ public class MainActivity extends AppCompatActivity
                 Intent i = new Intent(getApplicationContext(), TopicActivity.class);
                 startActivity(i);
                 fragmentClass = EventsFragment.class;
+            case R.id.nav_profile:
+                fragmentClass = ProfileFragment.class;
+                break;
             default:
                 fragmentClass = EventsFragment.class;
         }

@@ -27,31 +27,45 @@
             android:textStyle="bold"
             android:layout_alignParentTop="true"
             android:layout_width="match_parent"
-            android:layout_height="25dp"
-            android:layout_toEndOf="@+id/event_image" />
-
-        <TextView
-            android:id="@+id/category"
-            android:layout_below="@id/title"
-            android:textColor="@color/colorAccent"
-            android:layout_width="match_parent"
-            android:layout_height="25dp"
+            android:layout_height="20dp"
             android:layout_toEndOf="@+id/event_image" />
 
         <TextView
             android:id="@+id/date"
             android:layout_width="wrap_content"
-            android:textColor="@color/colorAccent"
             android:layout_height="25dp"
-            android:layout_alignParentEnd="true"
-            android:layout_toEndOf="@+id/event_image"
-            android:layout_below="@+id/category" />
+            android:textColor="@color/black_overlay"
+            android:layout_below="@+id/title"
+            android:layout_alignStart="@+id/title"
+            android:layout_alignParentEnd="true" />
 
         <ImageView
             android:layout_width="@dimen/list_detail_image_size"
             android:layout_height="@dimen/list_detail_image_size"
-            android:layout_marginRight="5dp"
+            android:layout_marginRight="10dp"
             android:id="@+id/event_image"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/date"
+            android:layout_alignStart="@+id/date">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:text=""
+                android:textColor="@color/colorPrimaryLight"
+                android:id="@+id/category" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ver"
+                android:id="@+id/btnSee" />
+        </LinearLayout>
 
     </RelativeLayout>
 

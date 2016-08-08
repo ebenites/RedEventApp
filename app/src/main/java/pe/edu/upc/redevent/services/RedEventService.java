@@ -60,4 +60,7 @@ public interface RedEventService {
     @POST("/api/users/{userid}/events/{eventid}")
     Call<String> joinEvent(@Path("userid") String userid, @Path("eventid") String eventid );
 
+    @GET("/api/users/{id}")
+    Call<User> getUser(@Path("id") long userid);
+
 }
