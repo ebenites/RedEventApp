@@ -35,6 +35,8 @@ import java.net.URL;
 import pe.edu.upc.redevent.R;
 
 import pe.edu.upc.redevent.models.APIError;
+import pe.edu.upc.redevent.models.APISuccess;
+import pe.edu.upc.redevent.models.EventDetail;
 import pe.edu.upc.redevent.models.User;
 import pe.edu.upc.redevent.services.RedEventService;
 import pe.edu.upc.redevent.services.RedEventServiceGenerator;
@@ -113,7 +115,36 @@ public class EventDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 RedEventService service = RedEventServiceGenerator.createService();
-                service.checking(userId, eventId);
+                Call<APISuccess> call = service.checking(userId, eventId );
+
+                call.enqueue(new Callback<APISuccess>() {
+                    @Override
+                    public void onResponse(Call<APISuccess> call, Response<APISuccess> response) {
+                        int statusCode = response.code();
+                        Log.d(MainActivity.class.getSimpleName(), "HTTP status code: " + statusCode);
+
+                        if(response.isSuccessful()) {
+
+                            APISuccess APISuccess = response.body();
+                            Log.e(this.getClass().getSimpleName(), "APISuccess " +  APISuccess.getMessage());
+
+                        }else{
+                            // Best Practice APIError: https://futurestud.io/blog/retrofit-2-simple-error-handling
+                            APIError error = APIError.parseError(response);
+                            Log.e(this.getClass().getSimpleName(), "ApiError " + error.getStatus() + ":" + error.getMessage());
+                          }
+                    }
+
+                    @Override
+                    public void onFailure(Call<APISuccess> call, Throwable t) {
+                        Log.e(this.getClass().getSimpleName(), "onFailure:" + t.getMessage());
+                        t.printStackTrace();
+                    }
+
+                });
+
+
+
                 displayQuestionRating();
             }
         });
@@ -127,7 +158,33 @@ public class EventDetailActivity extends AppCompatActivity {
 
         RedEventService service = RedEventServiceGenerator.createService();
 
-        service.rating(userId, eventId, value);
+        Call<APISuccess> call = service.rating(userId, eventId, value);
+
+        call.enqueue(new Callback<APISuccess>() {
+            @Override
+            public void onResponse(Call<APISuccess> call, Response<APISuccess> response) {
+                int statusCode = response.code();
+                Log.d(MainActivity.class.getSimpleName(), "HTTP status code: " + statusCode);
+
+                if(response.isSuccessful()) {
+
+                    APISuccess APISuccess = response.body();
+                    Log.e(this.getClass().getSimpleName(), "APISuccess " +  APISuccess.getMessage());
+
+                }else{
+                    // Best Practice APIError: https://futurestud.io/blog/retrofit-2-simple-error-handling
+                    APIError error = APIError.parseError(response);
+                    Log.e(this.getClass().getSimpleName(), "ApiError " + error.getStatus() + ":" + error.getMessage());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<APISuccess> call, Throwable t) {
+                Log.e(this.getClass().getSimpleName(), "onFailure:" + t.getMessage());
+                t.printStackTrace();
+            }
+
+        });
 
         startActivity(new Intent(EventDetailActivity.this, TopicActivity.class));
         finish();

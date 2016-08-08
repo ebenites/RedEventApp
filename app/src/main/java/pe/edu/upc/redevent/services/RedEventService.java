@@ -4,6 +4,7 @@ package pe.edu.upc.redevent.services;
 
         import java.util.List;
 
+        import pe.edu.upc.redevent.models.APISuccess;
         import pe.edu.upc.redevent.models.EventDetail;
         import pe.edu.upc.redevent.models.User;
         import retrofit2.Call;
@@ -32,9 +33,9 @@ public interface RedEventService {
     Call<User> glogin(@Field("email") String email, @Field("googleid") String googleid, @Field("fullname") String fullname);
 
     @PUT("/api/users/{userid}/events/{eventid}")
-    Call<EventDetail> checking(@Path("userid") String userid, @Path("eventid") String eventid, @Body EventDetail users);
+    Call<APISuccess> checking(@Path("userid") String userid, @Path("eventid") String eventid);
 
     @PUT("/api/users/{userid}/events/{eventid}/{rating}")
-    Call<EventDetail> rating(@Path("userid") String userid, @Path("eventid") String eventid, @Field("rating") Number rating, @Body EventDetail users);
+    Call<APISuccess> rating(@Path("userid") String userid, @Path("eventid") String eventid, @Field("rating") Number rating);
 
 }
