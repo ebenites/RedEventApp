@@ -16,6 +16,7 @@
     <uses-permission android:name="android.permission.CAPTURE_AUDIO_OUTPUT" />
     <uses-permission android:name="android.permission.CAPTURE_VIDEO_OUTPUT" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <uses-feature android:name="android.hardware.camera2" />
 
@@ -28,7 +29,7 @@
         android:name="com.orm.SugarApp">
 
         <meta-data android:name="DATABASE" android:value="redevent.db"/>
-        <meta-data android:name="VERSION" android:value="1"/>
+        <meta-data android:name="VERSION" android:value="2"/>
         <meta-data android:name="QUERY_LOG" android:value="true" />
         <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="pe.edu.upc.redevent.models" />
 

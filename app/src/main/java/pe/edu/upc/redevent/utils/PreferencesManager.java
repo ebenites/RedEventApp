@@ -48,7 +48,7 @@ public class PreferencesManager {
         return email;
     }
 
-    private void removePreference(String param) {
+    public void removePreference(String param) {
         SharedPreferences.Editor e = sharedPreferences.edit();
         e.putString(param, null);
         e.commit();

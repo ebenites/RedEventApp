@@ -30,6 +30,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="login_welcome_back">"Welcome back, "</string>
+    <string name="topic_empty_topics_selected_message">You must selected any topic.</string>
 
 
 </resources>

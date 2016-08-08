@@ -1,26 +1,31 @@
 package pe.edu.upc.redevent.activities;
 
-import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Typeface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.SparseBooleanArray;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.CheckBox;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import java.util.Random;
+import com.orm.SugarRecord;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import pe.edu.upc.redevent.R;
+import pe.edu.upc.redevent.adapters.ImageAdapter;
+import pe.edu.upc.redevent.models.APIError;
+import pe.edu.upc.redevent.models.APIMessage;
+import pe.edu.upc.redevent.models.Topic;
+import pe.edu.upc.redevent.models.User;
+import pe.edu.upc.redevent.services.RedEventService;
+import pe.edu.upc.redevent.services.RedEventServiceGenerator;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Basado en https://github.com/paramvir-b/AndroidGridViewCompatLib
@@ -34,153 +39,135 @@ public class TopicActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_topics);
 
-        gridView = (GridView) findViewById(R.id.topicsGridview);
-        gridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE);
-        gridView.setAdapter(new ImageAdapter(this));
-
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> view, View arg1, int pos, long id) {
-                // We need to invalidate all views on 4.x versions
-                GridView gridView = (GridView) view;
-                gridView.invalidateViews();
-            }
-        });
-
+        initTopicsGridVIew();
     }
 
+    private void initTopicsGridVIew(){
+        try {
 
-    public class ImageAdapter extends BaseAdapter {
+            RedEventService service = RedEventServiceGenerator.createService();
 
-        private Context context;
+            Call<List<Topic>> call = service.getTopics();
 
-        // references to our images
-        private Integer[] thumbIds = {
-                R.drawable.topic_1, R.drawable.topic_2, R.drawable.topic_3, R.drawable.topic_4, R.drawable.topic_5,
-                R.drawable.topic_6, R.drawable.topic_7, R.drawable.topic_8, R.drawable.topic_9, R.drawable.topic_10,
-                R.drawable.topic_11, R.drawable.topic_12, R.drawable.topic_13, R.drawable.topic_14, R.drawable.topic_15,
-                R.drawable.topic_16, R.drawable.topic_17, R.drawable.topic_18, R.drawable.topic_19, R.drawable.topic_20
-        };
+            call.enqueue(new Callback<List<Topic>>() {
+                @Override
+                public void onResponse(Call<List<Topic>> call, Response<List<Topic>> response) {
 
-        private String[] thumbLabels = {
-                "Música", "Negocios", "Gastronomía", "Comunidad", "Artes",
-                "Cine y medios de comunicación", "Deportes y salud", "Salud", "Ciencia y tecnología", "Viajes y actividades al aire libre",
-                "Organizaciones y causas benéficas", "Espiritualidad", "Familia y educación", "Vacaciones", "Gobierno",
-                "Moda", "Hogar y estilo de vida", "Coches, barcos y aviones", "Aficiones", "Otros"
-        };
+                    int statusCode = response.code();
+                    Log.d(MainActivity.class.getSimpleName(), "HTTP status code: " + statusCode);
 
-        public ImageAdapter(Context context) {
-            this.context = context;
-        }
+                    if(response.isSuccessful()) {
 
-        public int getCount() {
-            return thumbIds.length;
-        }
+                        List<Topic> topics = response.body();
 
-        public Object getItem(int position) {
-            return null;
-        }
+                        gridView = (GridView) findViewById(R.id.topicsGridview);
+                        gridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE);
+                        gridView.setAdapter(new ImageAdapter(getApplication(), topics));
 
-        public long getItemId(int position) {
-            return 0;
-        }
+                        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> view, View arg1, int pos, long id) {
+                                // We need to invalidate all views on 4.x versions
+                                GridView gridView = (GridView) view;
+                                gridView.invalidateViews();
+                            }
+                        });
 
-        // create a new ImageView for each item referenced by the Adapter
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            RelativeLayout itemRelativeLayout;
-            ImageView imageView;
-            CheckBox checkBox;
-            TextView textView;
-
-            if (convertView == null) {
-
-                itemRelativeLayout = new RelativeLayout(context);
-//                itemRelativeLayout.setBackgroundColor(Color.RED);
-
-                // ImageView
-
-                imageView = new ImageView(context);
-                imageView.setId(new Random().nextInt(50000) + 1);
-                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-                RelativeLayout.LayoutParams imageViewLayoutParams = new RelativeLayout.LayoutParams(250, 250);
-                imageViewLayoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                imageView.setLayoutParams(imageViewLayoutParams);
-
-                itemRelativeLayout.addView(imageView);
-
-                // CheckBox
-
-                checkBox = new CheckBox(context);
-                checkBox.setClickable(false);
-                checkBox.setFocusable(false);
-
-                RelativeLayout.LayoutParams checkBoxLayoutParams = new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.WRAP_CONTENT,
-                        RelativeLayout.LayoutParams.WRAP_CONTENT);
-                checkBoxLayoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, imageView.getId());
-                checkBoxLayoutParams.addRule(RelativeLayout.ALIGN_END, imageView.getId());
-                checkBox.setLayoutParams(checkBoxLayoutParams);
-
-                itemRelativeLayout.addView(checkBox);
-
-                // TextView
-
-                textView = new TextView(context);
-                textView.setGravity(Gravity.CENTER);
-                textView.setTextColor(Color.WHITE);
-                textView.setTypeface(null, Typeface.BOLD);
-                textView.setShadowLayer(2.5f, -1.5f, 1.5f, Color.BLACK);
-                textView.setText(thumbLabels[position]);
-
-                RelativeLayout.LayoutParams textViewLayoutParams = new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.MATCH_PARENT,
-                        RelativeLayout.LayoutParams.WRAP_CONTENT);
-                checkBoxLayoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, imageView.getId());
-                textView.setLayoutParams(textViewLayoutParams);
-
-                itemRelativeLayout.addView(textView);
-
-            }else{
-
-                itemRelativeLayout = (RelativeLayout)convertView;
-
-                imageView = (ImageView) itemRelativeLayout.getChildAt(0);
-                checkBox = (CheckBox) itemRelativeLayout.getChildAt(1);
-
-            }
-
-            GridView gvc = (GridView) parent;
-            if (gvc.getChoiceMode() == ListView.CHOICE_MODE_MULTIPLE) {
-                SparseBooleanArray checkArray;
-                checkArray = gvc.getCheckedItemPositions();
-
-                if (checkArray != null) {
-
-                    int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-                    if (checkArray.get(position)) {
-                        checkBox.setChecked(true);
-//                        imageView.setPadding(10,10,10,10);
-//                        imageView.setBackgroundColor(getColor(R.color.colorPrimaryDark));
-                        imageView.animate().setDuration(shortAnimTime).alpha(0.5f);
-//                        imageView.setAlpha(0.5f);
                     }else{
-                        checkBox.setChecked(false);
-//                        imageView.setPadding(10,10,10,10);
-//                        imageView.setPadding(0,0,0,0);
-//                        imageView.setBackgroundColor(Color.WHITE);
-                        imageView.animate().setDuration(shortAnimTime).alpha(1f);
-//                        imageView.setAlpha(1f);
+                        // Best Practice APIError: https://futurestud.io/blog/retrofit-2-simple-error-handling
+                        APIError error = APIError.parseError(response);
+                        Log.e(this.getClass().getSimpleName(), "ApiError " + error.getStatus() + ":" + error.getMessage());
+                        Toast.makeText(getApplication(), error.getMessage(), Toast.LENGTH_LONG).show();
                     }
+
                 }
 
-            }
+                @Override
+                public void onFailure(Call<List<Topic>> call, Throwable t) {
+                    // Log error here since request failed
+                    Log.e(this.getClass().getSimpleName(), "onFailure:" + t.getMessage());
+                    Toast.makeText(getApplication(), t.getMessage(), Toast.LENGTH_LONG).show();
+                    t.printStackTrace();
+                }
 
-            imageView.setImageResource(thumbIds[position]);
-            return itemRelativeLayout;
+            });
+
+        } catch (Exception e) {
+            Log.e(this.getClass().getSimpleName(), "Exception!" + e.getMessage());
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+    }
+
+    public void savePreferences(View view){
+
+        SparseBooleanArray checkArray = gridView.getCheckedItemPositions();
+
+        if(checkArray.size() == 0){
+            Toast.makeText(getApplication(), R.string.topic_empty_topics_selected_message, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        List<Long> mytopics = new ArrayList<>();
+        for (int i=0; i<gridView.getAdapter().getCount();i++){
+            if (checkArray.get(i)) {
+                ImageAdapter imageAdapter = (ImageAdapter)gridView.getAdapter();
+                Topic topic = imageAdapter.getTopic(i);
+                mytopics.add(topic.getId());
+            }
+        }
+
+        Log.d(this.getClass().getSimpleName(), "Topics: " + mytopics);
+
+        // Get last user loggind
+        User user = SugarRecord.last(User.class);
+
+        try {
+
+            RedEventService service = RedEventServiceGenerator.createService();
+
+            Call<APIMessage> call = service.savePreferences(user.getId(), mytopics);
+
+            call.enqueue(new Callback<APIMessage>() {
+                @Override
+                public void onResponse(Call<APIMessage> call, Response<APIMessage> response) {
+
+                    int statusCode = response.code();
+                    Log.d(MainActivity.class.getSimpleName(), "HTTP status code: " + statusCode);
+
+                    if(response.isSuccessful()) {
+
+                        APIMessage apiMessage = response.body();
+                        Log.d(TopicActivity.class.getSimpleName(), "APIMessage:" + apiMessage.getMessage());
+
+                        startActivity(new Intent(TopicActivity.this, MainActivity.class));
+                        finish();
+
+                    }else{
+                        // Best Practice APIError: https://futurestud.io/blog/retrofit-2-simple-error-handling
+                        APIError error = APIError.parseError(response);
+                        Log.e(this.getClass().getSimpleName(), "ApiError " + error.getStatus() + ":" + error.getMessage());
+                        Toast.makeText(getApplication(), error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+
+                }
+
+                @Override
+                public void onFailure(Call<APIMessage> call, Throwable t) {
+                    // Log error here since request failed
+                    Log.e(this.getClass().getSimpleName(), "onFailure:" + t.getMessage());
+                    Toast.makeText(getApplication(), t.getMessage(), Toast.LENGTH_LONG).show();
+                    t.printStackTrace();
+                }
+
+            });
+
+        } catch (Exception e) {
+            Log.e(this.getClass().getSimpleName(), "Exception!" + e.getMessage());
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
         }
 
     }
+
 }

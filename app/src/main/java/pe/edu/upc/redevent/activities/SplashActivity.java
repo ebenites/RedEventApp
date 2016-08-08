@@ -7,6 +7,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
 import pe.edu.upc.redevent.R;
+import pe.edu.upc.redevent.utils.PreferencesManager;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -20,11 +21,20 @@ public class SplashActivity extends AppCompatActivity {
 
         new Handler().postDelayed(new Runnable() {
             public void run() {
-                startActivity(new Intent(SplashActivity.this, LoginActivity.class));
-                finish();
+                verifyLogged();
             }
         }, SPLASH_DISPLAY_LENGTH);
 
+    }
+
+    private void verifyLogged(){
+        PreferencesManager preferencesManager = PreferencesManager.getInstance(this);
+        if(preferencesManager.loadPreference(PreferencesManager.PREF_ISLOGGED) != null){
+            startActivity(new Intent(SplashActivity.this, MainActivity.class));
+        }else{
+            startActivity(new Intent(SplashActivity.this, LoginActivity.class));
+        }
+        finish();
     }
 
     @Override

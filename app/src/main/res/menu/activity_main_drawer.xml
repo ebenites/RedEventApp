@@ -15,6 +15,11 @@
             android:icon="@drawable/common_ic_googleplayservices"
             android:title="Perfil" />
 
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/common_ic_googleplayservices"
+            android:title="Salir" />
+
     </group>
 
 </menu>

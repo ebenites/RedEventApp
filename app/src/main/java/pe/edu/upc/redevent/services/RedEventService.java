@@ -2,13 +2,20 @@ package pe.edu.upc.redevent.services;
 
 import java.util.List;
 
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import pe.edu.upc.redevent.models.APIMessage;
 import pe.edu.upc.redevent.models.Event;
+import pe.edu.upc.redevent.models.Topic;
 import pe.edu.upc.redevent.models.User;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 
 /**
@@ -22,11 +29,17 @@ public interface RedEventService {
     @POST("/api/login")
     Call<User> login(@Field("email") String email, @Field("password") String password);
 
-    @FormUrlEncoded
+    @Multipart
     @POST("/api/glogin")
-    Call<User> glogin(@Field("email") String email, @Field("googleid") String googleid, @Field("fullname") String fullname);
+    Call<User> glogin(@Part("email") RequestBody email, @Part("token") RequestBody token, @Part("googleid") RequestBody googleid, @Part("fullname") RequestBody fullname, @Part MultipartBody.Part photo);
 
     @GET("/api/users/{id}/events")
     Call<List<Event>> getEvents(@Path("id") long userId);
+
+    @POST("/api/users/{id}/topics")
+    Call<APIMessage> savePreferences(@Path("id") long userId, @Body List<Long> topics);
+
+    @GET("/api/topics")
+    Call<List<Topic>> getTopics();
 
 }

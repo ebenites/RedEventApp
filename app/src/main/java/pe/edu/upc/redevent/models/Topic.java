@@ -12,6 +12,8 @@ public class Topic{
 
     private String name;
 
+    private String image;
+
     public Topic() {
     }
 
@@ -31,11 +33,20 @@ public class Topic{
         this.name = name;
     }
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     @Override
     public String toString() {
         return "Topic{" +
-                "name='" + name + '\'' +
-                ", id=" + id +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", image='" + image + '\'' +
                 '}';
     }
 }

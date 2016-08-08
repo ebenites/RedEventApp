@@ -12,9 +12,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.orm.SugarRecord;
+
 import pe.edu.upc.redevent.R;
+import pe.edu.upc.redevent.models.User;
 import pe.edu.upc.redevent.ui.fragments.EventsFragment;
 import pe.edu.upc.redevent.ui.fragments.MyEventsFragment;
+import pe.edu.upc.redevent.utils.PreferencesManager;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -81,6 +85,12 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_myevents:
                 fragmentClass = MyEventsFragment.class;
                 break;
+            case R.id.nav_logout:
+                PreferencesManager preferencesManager = PreferencesManager.getInstance(this);
+                preferencesManager.removePreference(PreferencesManager.PREF_ISLOGGED);
+                SugarRecord.deleteAll(User.class);
+                finish();
+                return true;
             default:
                 fragmentClass = EventsFragment.class;
         }

@@ -38,6 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:text="@string/topics_save_button"
-        android:id="@+id/saveButton" />
+        android:id="@+id/saveButton"
+        android:onClick="savePreferences" />
 
 </RelativeLayout>

@@ -6,8 +6,11 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -37,10 +40,17 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.orm.SugarRecord;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import pe.edu.upc.redevent.R;
 import pe.edu.upc.redevent.models.APIError;
 import pe.edu.upc.redevent.models.User;
@@ -140,6 +150,7 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
 
         // Request Permissions
         validatePermissions();
+
     }
 
     private void attemptEmailSignIn() {
@@ -302,6 +313,7 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
             if (result.isSuccess()) {
                 // Google Sign In was successful
                 GoogleSignInAccount account = result.getSignInAccount();
+                Log.d(TAG, account.getId());
                 Log.d(TAG, account.getDisplayName());
                 Log.d(TAG, account.getEmail());
                 Log.d(TAG, account.getPhotoUrl().toString());
@@ -312,12 +324,54 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
                 /*
                     Login or Register Process with Google ...
                  */
-                /*
+
                 try {
 
                     RedEventService service = RedEventServiceGenerator.createService();
 
-                    Call<User> call = service.login(email, password);
+                    /*
+                        How to Upload Files to Server: https://futurestud.io/blog/retrofit-2-how-to-upload-files-to-server
+                     */
+
+                    Picasso.with(this).load(account.getPhotoUrl().toString()).into(new Target() {
+                        @Override
+                        public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+                            File file = new File(Environment.getExternalStorageDirectory().getPath()  + "/photo.jpg");
+                            try {
+                                file.createNewFile();
+                                FileOutputStream ostream = new FileOutputStream(file);
+                                bitmap.compress(Bitmap.CompressFormat.JPEG,100,ostream);
+                                ostream.close();
+
+                                // Parece que debe estar aqui todo y si no hay imagen que igual siga con el api
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onBitmapFailed(Drawable errorDrawable) {}
+
+                        @Override
+                        public void onPrepareLoad(Drawable placeHolderDrawable) {}
+                    });
+
+                    File file = new File(Environment.getExternalStorageDirectory().getPath()  + "/photo.jpg");
+
+                    // create RequestBody instance from file
+                    RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+
+                    // MultipartBody.Part is used to send also the actual file name
+                    MultipartBody.Part body = MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
+
+                    // add another part within the multipart request
+                    RequestBody email = RequestBody.create(MediaType.parse("multipart/form-data"), account.getEmail());
+                    RequestBody gtoken = RequestBody.create(MediaType.parse("multipart/form-data"), account.getIdToken());
+                    RequestBody googleid = RequestBody.create(MediaType.parse("multipart/form-data"), account.getId());
+                    RequestBody fullname = RequestBody.create(MediaType.parse("multipart/form-data"), account.getDisplayName());
+
+                    Call<User> call = service.glogin(email, gtoken, googleid, fullname, body);
 
                     call.enqueue(new Callback<User>() {
                         @Override
@@ -382,15 +436,9 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
                     e.printStackTrace();
                 }
 
-                */
 
 
 
-
-                /**
-                 * End SharedPreferences
-                 */
-//
 //                /*TEMP*/    mProgressView.setVisibility(View.GONE);
 //                /*TEMP*/    mProgressView.animate().setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime)).alpha(0).setListener(new AnimatorListenerAdapter() {
 //                    @Override
@@ -409,7 +457,6 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
             } else {
                 // Google Sign In failed, update UI appropriately
                 Log.e(TAG, "Google Sign In failed!");
-
                 Toast.makeText(this, "Google Sign In failed!", Toast.LENGTH_LONG).show();
             }
         }
