@@ -26,21 +26,32 @@
             android:textStyle="bold"
             android:layout_alignParentTop="true"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/event_image" />
 
         <TextView
             android:id="@+id/category"
             android:layout_below="@id/title"
             android:textColor="@color/colorAccent"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/event_image" />
 
         <TextView
             android:id="@+id/date"
             android:layout_width="wrap_content"
             android:textColor="@color/colorAccent"
-            android:layout_alignParentRight="true"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@+id/event_image"
+            android:layout_below="@+id/category" />
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:id="@+id/event_image"
+            android:layout_alignParentStart="true"
+            android:layout_alignBottom="@+id/date" />
 
     </RelativeLayout>
 
