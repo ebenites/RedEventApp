@@ -84,11 +84,9 @@ public class EventDetailActivity extends AppCompatActivity {
 
             String imageURL= (String) extras.get("imageURL");
             String descriptionEvent=(String)extras.get("descriptionEvent");
-            String datevalueEvent= (String) extras.get("dateValueEvent");
+            String dateValueEvent = (String) extras.get("dateValueEvent");
             String addressEvent= (String) extras.get("addressEvent");
             String priceValueEvent = (String) extras.get("priceValueEvent");
-
-
 
             imageURL = RedEventService.API_BASE_URL + imageURL;
 
@@ -102,7 +100,7 @@ public class EventDetailActivity extends AppCompatActivity {
            //mImageEvent.setImageBitmap(getBitmapFromURL(imageURL));
 
             mDescriptionEvent.setText(descriptionEvent);
-            mDateEvent.setText(datevalueEvent);
+            mDateEvent.setText(dateValueEvent);
             mPriceEvent.setText(priceValueEvent);
             mAddressEvent.setText(addressEvent);
 
