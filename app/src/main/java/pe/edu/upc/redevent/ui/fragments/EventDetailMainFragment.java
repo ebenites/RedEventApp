@@ -37,12 +37,38 @@ import retrofit2.Response;
 
 public class EventDetailMainFragment extends  Fragment {
 
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private Event event;
+    private ImageView mImageEvent;
+    private TextView descriptionDetailEvent;
+    private TextView dateDetailEvent;
+    private TextView hourDetailEvent;
+    private TextView addressDetailEvent;
+
+    private String userId;
+    private String eventId;
+    private String status;
+
     private ImageView imageDetailEvent;
-    private TextView descriptionDetailEvent, dateDetailEvent, hourDetailEvent, addressDetailEvent;
-    public EventDetailMainFragment() {
-        // Required empty public constructor
+
+    float userrating;
+
+    private Event mEvent;
+
+    public static EventDetailMainFragment getInstance(Event event, long userId) {
+        EventDetailMainFragment f = new EventDetailMainFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("event", event);
+        args.putLong("users_id", userId);
+        f.setArguments(args);
+        return f;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            userId = String.valueOf(getArguments().getLong("users_id"));
+            mEvent =  (Event) getArguments().getSerializable("event");
+        }
     }
 
     @Override
@@ -50,26 +76,24 @@ public class EventDetailMainFragment extends  Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_event_detail_main, container, false);
-        event = (Event)getArguments().getSerializable("EVENT");
         imageDetailEvent = (ImageView) view.findViewById(R.id.imageDetailEvent);
         descriptionDetailEvent = (TextView) view.findViewById(R.id.descriptionDetailEvent);
         dateDetailEvent = (TextView) view.findViewById(R.id.dateDetailEvent);
         hourDetailEvent = (TextView) view.findViewById(R.id.hourDetailEvent);
         addressDetailEvent = (TextView) view.findViewById(R.id.addressDetailEvent);
         Button buttonJoin = (Button) view.findViewById(R.id.buttonJoin);
-        descriptionDetailEvent.setText(event.getDescription());
-        addressDetailEvent.setText(event.getAddress());
+        descriptionDetailEvent.setText(mEvent.getDescription());
+        addressDetailEvent.setText(mEvent.getAddress());
         Picasso.with(view.getContext()).
-                load(RedEventService.API_BASE_URL.concat(event.getImage()))
-                .resize(120, 120)
-                .centerCrop()
+                load(RedEventService.API_BASE_URL.concat(mEvent.getImage()))
+                .placeholder(R.drawable.image_default)
                 .into(imageDetailEvent);
 
         buttonJoin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("RedEvent",  " click join evnt " +event.getName());
-                joinToEvent(event);
+                Log.d("RedEvent",  " click join evnt " + mEvent.getName());
+                joinToEvent(mEvent);
             }
         });
         return view;

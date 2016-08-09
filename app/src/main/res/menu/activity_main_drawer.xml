@@ -11,10 +11,6 @@
             android:icon="@drawable/common_ic_googleplayservices"
             android:title="Mis Eventos" />
         <item
-            android:id="@+id/nav_topic"
-            android:icon="@drawable/common_ic_googleplayservices"
-            android:title="Categorias" />
-        <item
             android:id="@+id/nav_profile"
             android:icon="@drawable/common_ic_googleplayservices"
             android:title="Perfil" />

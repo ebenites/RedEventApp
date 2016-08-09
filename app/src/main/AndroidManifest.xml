@@ -46,6 +46,7 @@
         </activity>
         <activity
             android:name=".activities.MainActivity"
+            android:screenOrientation="portrait"
             android:label="Main"
             android:theme="@style/AppTheme.NoActionBar"><!-- Si todos son NoActionBar definirlo a nivel de <appllication> -->
         </activity>

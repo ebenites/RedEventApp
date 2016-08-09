@@ -93,10 +93,6 @@ public class MainActivity extends AppCompatActivity
                 SugarRecord.deleteAll(User.class);
                 finish();
                 return true;
-            case R.id.nav_topic:
-                Intent i = new Intent(getApplicationContext(), TopicActivity.class);
-                startActivity(i);
-                fragmentClass = EventsFragment.class;
             case R.id.nav_profile:
                 fragmentClass = ProfileFragment.class;
                 break;

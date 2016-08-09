@@ -75,10 +75,10 @@
                 android:layout_height="50dp"
                 android:text="20:30"
                 android:id="@+id/hourDetailEvent"
-                android:layout_below="@+id/dateEvent"
                 android:layout_alignParentEnd="true"
                 android:layout_toEndOf="@+id/textHourDetailEvent"
-                android:layout_alignBottom="@+id/textHourDetailEvent" />
+                android:layout_alignBottom="@+id/textHourDetailEvent"
+                android:layout_below="@+id/dateDetailEvent" />
 
 
             <TextView
@@ -94,10 +94,9 @@
                 android:layout_height="wrap_content"
                 android:text="Avenida Javier Prado 1144 San Isidro"
                 android:id="@+id/addressDetailEvent"
-                android:layout_below="@+id/hourEvent"
+                android:layout_below="@+id/textHourDetailEvent"
                 android:layout_alignParentEnd="true"
-                android:layout_toEndOf="@+id/textAddressEvent"
-                android:layout_alignBottom="@+id/textAddressEvent" />
+                android:layout_toEndOf="@+id/textHourDetailEvent" />
 
 
             <Button
