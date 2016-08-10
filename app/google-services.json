@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "479945493508-vfjcivhei4oer2uc0phqp9rj642bmfr4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pe.edu.upc.redevent",
+            "certificate_hash": "E4F69D50CD2E5A0F6D1E073BDC01D319246984AB"
+          }
+        },
+        {
+          "client_id": "479945493508-khgfsbk0sdsdt1q8un5je6qi9rrq20im.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pe.edu.upc.redevent",
+            "certificate_hash": "D387A2606306A39F7A8E1A647686430D54434BC9"
+          }
+        },
+        {
           "client_id": "479945493508-4988onl1c6scdedumjmsvnlg2kctgt82.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

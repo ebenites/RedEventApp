@@ -39,6 +39,10 @@ public interface RedEventService {
     @POST("/api/glogin")
     Call<User> glogin(@Part("email") RequestBody email, @Part("token") RequestBody token, @Part("googleid") RequestBody googleid, @Part("fullname") RequestBody fullname, @Part MultipartBody.Part photo);
 
+    @Multipart
+    @POST("/api/users/{id}/photo")
+    Call<APIMessage> upload_photo(@Path("id") long userId, @Part MultipartBody.Part photo);
+
     @GET("/api/users/{id}/events")
     Call<List<Event>> getEvents(@Path("id") long userId);
 
